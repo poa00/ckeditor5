@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 import type {
@@ -26,6 +26,7 @@ import type {
 	ImageCaptionUtils,
 	ImageInsertUI,
 	ImageResizeEditing,
+	ImageCustomResizeUI,
 	ImageSizeAttributes,
 	ImageStyleEditing,
 	ImageStyleUI,
@@ -77,6 +78,7 @@ declare module '@ckeditor/ckeditor5-core' {
 		[ ImageCaptionUtils.pluginName ]: ImageCaptionUtils;
 		[ ImageInsertUI.pluginName ]: ImageInsertUI;
 		[ ImageResizeEditing.pluginName ]: ImageResizeEditing;
+		[ ImageCustomResizeUI.pluginName ]: ImageCustomResizeUI;
 		[ ImageSizeAttributes.pluginName ]: ImageSizeAttributes;
 		[ ImageStyleEditing.pluginName ]: ImageStyleEditing;
 		[ ImageStyleUI.pluginName ]: ImageStyleUI;

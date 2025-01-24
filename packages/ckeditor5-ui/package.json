@@ -1,6 +1,6 @@
 {
   "name": "@ckeditor/ckeditor5-ui",
-  "version": "41.2.1",
+  "version": "44.1.0",
   "description": "The UI framework and standard UI library of CKEditor 5.",
   "keywords": [
     "ckeditor",
@@ -12,49 +12,53 @@
   "type": "module",
   "main": "src/index.ts",
   "dependencies": {
-    "@ckeditor/ckeditor5-core": "41.2.1",
-    "@ckeditor/ckeditor5-utils": "41.2.1",
+    "@ckeditor/ckeditor5-core": "44.1.0",
+    "@ckeditor/ckeditor5-editor-multi-root": "44.1.0",
+    "@ckeditor/ckeditor5-engine": "44.1.0",
+    "@ckeditor/ckeditor5-utils": "44.1.0",
+    "@types/color-convert": "2.0.4",
     "color-convert": "2.0.1",
     "color-parse": "1.4.2",
     "lodash-es": "4.17.21",
     "vanilla-colorful": "0.7.2"
   },
   "devDependencies": {
-    "@ckeditor/ckeditor5-autoformat": "41.2.1",
-    "@ckeditor/ckeditor5-basic-styles": "41.2.1",
-    "@ckeditor/ckeditor5-block-quote": "41.2.1",
-    "@ckeditor/ckeditor5-clipboard": "41.2.1",
-    "@ckeditor/ckeditor5-editor-balloon": "41.2.1",
-    "@ckeditor/ckeditor5-editor-classic": "41.2.1",
-    "@ckeditor/ckeditor5-editor-decoupled": "41.2.1",
-    "@ckeditor/ckeditor5-editor-inline": "41.2.1",
-    "@ckeditor/ckeditor5-editor-multi-root": "41.2.1",
-    "@ckeditor/ckeditor5-engine": "41.2.1",
-    "@ckeditor/ckeditor5-enter": "41.2.1",
-    "@ckeditor/ckeditor5-essentials": "41.2.1",
-    "@ckeditor/ckeditor5-find-and-replace": "41.2.1",
-    "@ckeditor/ckeditor5-font": "41.2.1",
-    "@ckeditor/ckeditor5-heading": "41.2.1",
-    "@ckeditor/ckeditor5-horizontal-line": "41.2.1",
-    "@ckeditor/ckeditor5-image": "41.2.1",
-    "@ckeditor/ckeditor5-indent": "41.2.1",
-    "@ckeditor/ckeditor5-link": "41.2.1",
-    "@ckeditor/ckeditor5-list": "41.2.1",
-    "@ckeditor/ckeditor5-media-embed": "41.2.1",
-    "@ckeditor/ckeditor5-mention": "41.2.1",
-    "@ckeditor/ckeditor5-paragraph": "41.2.1",
-    "@ckeditor/ckeditor5-source-editing": "41.2.1",
-    "@ckeditor/ckeditor5-special-characters": "41.2.1",
-    "@ckeditor/ckeditor5-table": "41.2.1",
-    "@ckeditor/ckeditor5-typing": "41.2.1",
-    "@ckeditor/ckeditor5-undo": "41.2.1",
-    "@types/color-convert": "2.0.0",
+    "@ckeditor/ckeditor5-autoformat": "44.1.0",
+    "@ckeditor/ckeditor5-basic-styles": "44.1.0",
+    "@ckeditor/ckeditor5-block-quote": "44.1.0",
+    "@ckeditor/ckeditor5-clipboard": "44.1.0",
+    "@ckeditor/ckeditor5-editor-balloon": "44.1.0",
+    "@ckeditor/ckeditor5-editor-classic": "44.1.0",
+    "@ckeditor/ckeditor5-editor-decoupled": "44.1.0",
+    "@ckeditor/ckeditor5-editor-inline": "44.1.0",
+    "@ckeditor/ckeditor5-enter": "44.1.0",
+    "@ckeditor/ckeditor5-essentials": "44.1.0",
+    "@ckeditor/ckeditor5-find-and-replace": "44.1.0",
+    "@ckeditor/ckeditor5-font": "44.1.0",
+    "@ckeditor/ckeditor5-heading": "44.1.0",
+    "@ckeditor/ckeditor5-horizontal-line": "44.1.0",
+    "@ckeditor/ckeditor5-image": "44.1.0",
+    "@ckeditor/ckeditor5-indent": "44.1.0",
+    "@ckeditor/ckeditor5-link": "44.1.0",
+    "@ckeditor/ckeditor5-list": "44.1.0",
+    "@ckeditor/ckeditor5-media-embed": "44.1.0",
+    "@ckeditor/ckeditor5-mention": "44.1.0",
+    "@ckeditor/ckeditor5-paragraph": "44.1.0",
+    "@ckeditor/ckeditor5-source-editing": "44.1.0",
+    "@ckeditor/ckeditor5-special-characters": "44.1.0",
+    "@ckeditor/ckeditor5-table": "44.1.0",
+    "@ckeditor/ckeditor5-typing": "44.1.0",
+    "@ckeditor/ckeditor5-undo": "44.1.0",
+    "@ckeditor/ckeditor5-code-block": "44.1.0",
     "typescript": "5.0.4",
-    "webpack": "^5.58.1",
-    "webpack-cli": "^4.9.0"
+    "webpack": "^5.94.0",
+    "webpack-cli": "^5.1.4"
   },
+  "depcheckIgnore": [
+    "sinon"
+  ],
   "author": "CKSource (http://cksource.com/)",
-  "license": "GPL-2.0-or-later",
+  "license": "SEE LICENSE IN LICENSE.md",
   "homepage": "https://ckeditor.com/ckeditor-5",
   "bugs": "https://github.com/ckeditor/ckeditor5/issues",
   "repository": {
@@ -63,6 +67,7 @@
     "directory": "packages/ckeditor5-ui"
   },
   "files": [
+    "dist",
     "lang",
     "src/**/*.js",
     "src/**/*.d.ts",
@@ -71,6 +76,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsc -p ./tsconfig.json"
+    "build": "tsc -p ./tsconfig.json",
+    "build:dist": "node ../../scripts/nim/build-package.mjs"
   }
 }

@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -9,22 +9,13 @@
 
 /* globals console */
 
-// eslint-disable-next-line ckeditor5-rules/no-cross-package-imports
-import type { CKEditorError } from 'ckeditor5/src/utils.js';
-
-// eslint-disable-next-line ckeditor5-rules/no-cross-package-imports
-import type { Editor, EditorConfig, Context, EditorReadyEvent } from 'ckeditor5/src/core.js';
-
-// eslint-disable-next-line ckeditor5-rules/no-cross-package-imports
-import type { RootAttributes } from '@ckeditor/ckeditor5-editor-multi-root';
-
+import { throttle, cloneDeepWith, isElement, type DebouncedFunc } from 'lodash-es';
 import areConnectedThroughProperties from './utils/areconnectedthroughproperties.js';
 import Watchdog, { type WatchdogConfig } from './watchdog.js';
-
-import { throttle, cloneDeepWith, isElement, type DebouncedFunc } from 'lodash-es';
-
-// eslint-disable-next-line ckeditor5-rules/no-cross-package-imports
-import type { Node, Text, Element, Writer } from 'ckeditor5/src/engine.js';
+import type { CKEditorError } from '@ckeditor/ckeditor5-utils';
+import type { Node, Text, Element, Writer } from '@ckeditor/ckeditor5-engine';
+import type { Editor, EditorConfig, Context, EditorReadyEvent } from '@ckeditor/ckeditor5-core';
+import type { RootAttributes } from '@ckeditor/ckeditor5-editor-multi-root';
 
 /**
  * A watchdog for CKEditor 5 editors.
@@ -37,6 +28,14 @@ export default class EditorWatchdog<TEditor extends Editor = Editor> extends Wat
 	 * The current editor instance.
 	 */
 	private _editor: TEditor | null = null;
+
+	/**
+	 * A promise associated with the life cycle of the editor (creation or destruction processes).
+	 *
+	 * It is used to prevent the initialization of the editor if the previous instance has not been destroyed yet,
+	 * and conversely, to prevent the destruction of the editor if it has not been initialized.
+	 */
+	private _lifecyclePromise: Promise<unknown> | null = null;
 
 	/**
 	 * Throttled save method. The `save()` method is called the specified `saveInterval` after `throttledSave()` is called,
@@ -249,7 +248,7 @@ export default class EditorWatchdog<TEditor extends Editor = Editor> extends Wat
 		config: EditorConfig = this._config!,
 		context?: Context
 	): Promise<unknown> {
-		return Promise.resolve()
+		this._lifecyclePromise = Promise.resolve( this._lifecyclePromise )
 			.then( () => {
 				super._startErrorHandling();
 
@@ -282,7 +281,11 @@ export default class EditorWatchdog<TEditor extends Editor = Editor> extends Wat
 
 				this.state = 'ready';
 				this._fire( 'stateChange' );
+			} ).finally( () => {
+				this._lifecyclePromise = null;
 			} );
+
+		return this._lifecyclePromise;
 	}
 
 	/**
@@ -291,7 +294,7 @@ export default class EditorWatchdog<TEditor extends Editor = Editor> extends Wat
 	 * It also sets the state to `destroyed`.
 	 */
 	public override destroy(): Promise<unknown> {
-		return Promise.resolve()
+		this._lifecyclePromise = Promise.resolve( this._lifecyclePromise )
 			.then( () => {
 				this.state = 'destroyed';
 				this._fire( 'stateChange' );
@@ -299,7 +302,11 @@ export default class EditorWatchdog<TEditor extends Editor = Editor> extends Wat
 				super.destroy();
 
 				return this._destroy();
+			} ).finally( () => {
+				this._lifecyclePromise = null;
 			} );
+
+		return this._lifecyclePromise;
 	}
 
 	private _destroy(): Promise<unknown> {

@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -98,6 +98,13 @@ export default class MentionUI extends Plugin {
 	 */
 	public static get pluginName() {
 		return 'MentionUI' as const;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static override get isOfficialPlugin(): true {
+		return true;
 	}
 
 	/**
@@ -703,18 +710,25 @@ function getLastValidMarkerInText(
  */
 export function createRegExp( marker: string, minimumCharacters: number ): RegExp {
 	const numberOfCharacters = minimumCharacters == 0 ? '*' : `{${ minimumCharacters },}`;
-
 	const openAfterCharacters = env.features.isRegExpUnicodePropertySupported ? '\\p{Ps}\\p{Pi}"\'' : '\\(\\[{"\'';
 	const mentionCharacters = '.';
 
+	// I wanted to make an util out of it, but since this regexp uses "u" flag, it became difficult.
+	// When "u" flag is used, the regexp has "strict" escaping rules, i.e. if you try to escape a character that does not need
+	// to be escaped, RegExp() will throw. It made it difficult to write a generic util, because different characters are
+	// allowed in different context. For example, escaping "-" sometimes was correct, but sometimes it threw an error.
+	marker = marker.replace( /[.*+?^${}()\-|[\]\\]/g, '\\$&' );
+
 	// The pattern consists of 3 groups:
+	//
 	// - 0 (non-capturing): Opening sequence - start of the line, space or an opening punctuation character like "(" or "\"",
-	// - 1: The marker character,
+	// - 1: The marker character(s),
 	// - 2: Mention input (taking the minimal length into consideration to trigger the UI),
 	//
 	// The pattern matches up to the caret (end of string switch - $).
-	//               (0:      opening sequence       )(1:   marker  )(2:                typed mention              )$
-	const pattern = `(?:^|[ ${ openAfterCharacters }])([${ marker }])(${ mentionCharacters }${ numberOfCharacters })$`;
+	//               (0:      opening sequence       )(1: marker  )(2:                typed mention              )$
+	const pattern = `(?:^|[ ${ openAfterCharacters }])(${ marker })(${ mentionCharacters }${ numberOfCharacters })$`;
+
 	return new RegExp( pattern, 'u' );
 }
 
@@ -808,8 +822,8 @@ function isMarkerInExistingMention( markerPosition: Position ): boolean | null {
 /**
  * Checks if string is a valid mention marker.
  */
-function isValidMentionMarker( marker: string ): boolean | string {
-	return marker && marker.length == 1;
+function isValidMentionMarker( marker: string ): boolean {
+	return !!marker;
 }
 
 /**

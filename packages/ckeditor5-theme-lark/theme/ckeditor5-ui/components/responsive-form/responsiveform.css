@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 @import "@ckeditor/ckeditor5-ui/theme/mixins/_rwd.css";
@@ -37,7 +37,8 @@
 		& .ck-labeled-field-view {
 			margin: var(--ck-spacing-large) var(--ck-spacing-large) 0;
 
-			& .ck-input-text {
+			& .ck-input-text,
+			& .ck-input-number {
 				min-width: 0;
 				width: 100%;
 			}

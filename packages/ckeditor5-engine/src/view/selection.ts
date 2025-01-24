@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -36,7 +36,7 @@ import type EditableElement from './editableelement.js';
  * A selection can consist of {@link module:engine/view/range~Range ranges} that can be set by using
  * the {@link module:engine/view/selection~Selection#setTo `Selection#setTo()`} method.
  */
-export default class Selection extends EmitterMixin( TypeCheckable ) {
+export default class Selection extends /* #__PURE__ */ EmitterMixin( TypeCheckable ) {
 	/**
 	 * Stores all ranges that are selected.
 	 */

@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -19,7 +19,7 @@ import {
 /**
  * A collection to store document colors. It enforces colors to be unique.
  */
-export default class DocumentColorCollection extends ObservableMixin( Collection<ColorDefinition> ) {
+export default class DocumentColorCollection extends /* #__PURE__ */ ObservableMixin( Collection<ColorDefinition> ) {
 	/**
 	 * Indicates whether the document color collection is empty.
 	 *

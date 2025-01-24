@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -62,6 +62,13 @@ export default class Dialog extends Plugin {
 	/**
 	 * @inheritDoc
 	 */
+	public static override get isOfficialPlugin(): true {
+		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	constructor( editor: Editor ) {
 		super( editor );
 
@@ -71,7 +78,10 @@ export default class Dialog extends Plugin {
 		this._initFocusToggler();
 		this._initMultiRootIntegration();
 
-		this.set( 'id', null );
+		this.set( {
+			id: null,
+			isOpen: false
+		} );
 
 		// Add the information about the keystroke to the accessibility database.
 		editor.accessibility.addKeystrokeInfos( {
@@ -82,6 +92,17 @@ export default class Dialog extends Plugin {
 				mayRequireFn: true
 			} ]
 		} );
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public override destroy(): void {
+		super.destroy();
+
+		if ( Dialog._visibleDialogPlugin === this ) {
+			this._unlockBodyScroll();
+		}
 	}
 
 	/**
@@ -284,13 +305,16 @@ export default class Dialog extends Plugin {
 		} );
 
 		editor.ui.view.body.add( view );
-		editor.ui.focusTracker.add( view.element! );
 		editor.keystrokes.listenTo( view.element! );
 
 		// Unless the user specified a position, modals should always be centered on the screen.
 		// Otherwise, let's keep dialogs centered in the editing root by default.
 		if ( !position ) {
 			position = isModal ? DialogViewPosition.SCREEN_CENTER : DialogViewPosition.EDITOR_CENTER;
+		}
+
+		if ( isModal ) {
+			this._lockBodyScroll();
 		}
 
 		view.set( {
@@ -340,6 +364,10 @@ export default class Dialog extends Plugin {
 		const editor = this.editor;
 		const view = this.view;
 
+		if ( view.isModal ) {
+			this._unlockBodyScroll();
+		}
+
 		// Reset the content view to prevent its children from being destroyed in the standard
 		// View#destroy() (and collections) chain. If the content children were left in there,
 		// they would have to be re-created by the feature using the dialog every time the dialog
@@ -358,6 +386,20 @@ export default class Dialog extends Plugin {
 		this.id = null;
 		this.isOpen = false;
 		Dialog._visibleDialogPlugin = null;
+	}
+
+	/**
+	 * Makes the <body> unscrollable (e.g. when the modal shows up).
+	 */
+	private _lockBodyScroll(): void {
+		document.documentElement.classList.add( 'ck-dialog-scroll-locked' );
+	}
+
+	/**
+	 * Makes the <body> scrollable again (e.g. once the modal hides).
+	 */
+	private _unlockBodyScroll(): void {
+		document.documentElement.classList.remove( 'ck-dialog-scroll-locked' );
 	}
 }
 

@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -19,8 +19,8 @@ import type {
 
 import { uid, toArray, type ArrayOrItem } from 'ckeditor5/src/utils.js';
 
-import ListWalker, { iterateSiblingListBlocks } from './listwalker.js';
-import { type ListTypeOptions } from '../listediting.js';
+import ListWalker, { type ListWalkerOptions, SiblingListBlocksIterator } from './listwalker.js';
+import { type ListType } from '../listediting.js';
 
 /**
  * The list item ID generator.
@@ -47,7 +47,7 @@ export class ListItemUid {
 export interface ListElement extends Element {
 	getAttribute( key: 'listItemId' ): string;
 	getAttribute( key: 'listIndent' ): number;
-	getAttribute( key: 'listType' ): ListTypeOptions;
+	getAttribute( key: 'listType' ): ListType;
 	getAttribute( key: string ): unknown;
 }
 
@@ -130,18 +130,21 @@ export function getNestedListBlocks( listItem: Element ): Array<ListElement> {
  *
  * @internal
  * @param listItem Starting list item element.
+ * @param options Additional list walker options to modify the range of returned list items.
  */
-export function getListItems( listItem: Element ): Array<ListElement> {
+export function getListItems( listItem: Element, options?: ListWalkerOptions ): Array<ListElement> {
 	const backwardBlocks = new ListWalker( listItem, {
 		sameIndent: true,
-		sameAttributes: 'listType'
+		sameAttributes: 'listType',
+		...options
 	} );
 
 	const forwardBlocks = new ListWalker( listItem, {
 		sameIndent: true,
 		sameAttributes: 'listType',
 		includeSelf: true,
-		direction: 'forward'
+		direction: 'forward',
+		...options
 	} );
 
 	return [
@@ -496,7 +499,7 @@ export function outdentFollowingItems( lastBlock: Element, writer: Writer ): Arr
 	// that this is the same effect that we would be get by multiple use of outdent command. However doing
 	// it like this is much more efficient because it's less operation (less memory usage, easier OT) and
 	// less conversion (faster).
-	for ( const { node } of iterateSiblingListBlocks( lastBlock.nextSibling, 'forward' ) ) {
+	for ( const { node } of new SiblingListBlocksIterator( lastBlock.nextSibling ) ) {
 		// Check each next list item, as long as its indent is higher than 0.
 		const indent = node.getAttribute( 'listIndent' );
 
@@ -570,7 +573,7 @@ export function canBecomeSimpleListItem( block: Element, schema: Schema ): boole
 /**
  * Returns true if listType is of type `numbered` or `customNumbered`.
  */
-export function isNumberedListType( listType: ListTypeOptions ): boolean {
+export function isNumberedListType( listType: ListType ): boolean {
 	return listType == 'numbered' || listType == 'customNumbered';
 }
 

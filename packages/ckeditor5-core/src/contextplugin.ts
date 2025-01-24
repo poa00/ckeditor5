@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -35,7 +35,7 @@ import type PluginCollection from './plugincollection.js';
  * * An {@link module:core/plugin~Plugin editor plugin} can require a context plugin.
  * * A context plugin MUST NOT require an {@link module:core/plugin~Plugin editor plugin}.
  */
-export default class ContextPlugin extends ObservableMixin() implements PluginInterface {
+export default class ContextPlugin extends /* #__PURE__ */ ObservableMixin() implements PluginInterface {
 	/**
 	 * The context or editor instance.
 	 */
@@ -62,6 +62,20 @@ export default class ContextPlugin extends ObservableMixin() implements PluginIn
 	 */
 	public static get isContextPlugin(): true {
 		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static get isOfficialPlugin(): boolean {
+		return false;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static get isPremiumPlugin(): boolean {
+		return false;
 	}
 }
 

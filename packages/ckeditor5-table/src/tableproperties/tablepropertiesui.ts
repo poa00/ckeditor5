@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -31,7 +31,7 @@ import {
 } from '../utils/ui/table-properties.js';
 import { getSelectionAffectedTableWidget } from '../utils/ui/widget.js';
 import { getBalloonTablePositionData, repositionContextualBalloon } from '../utils/ui/contextualballoon.js';
-import { getNormalizedDefaultProperties, type NormalizedDefaultProperties } from '../utils/table-properties.js';
+import { getNormalizedDefaultTableProperties, type NormalizedDefaultProperties } from '../utils/table-properties.js';
 import type { Batch } from 'ckeditor5/src/engine.js';
 import type { EventInfo, ObservableChangeEvent } from 'ckeditor5/src/utils.js';
 
@@ -101,6 +101,13 @@ export default class TablePropertiesUI extends Plugin {
 	/**
 	 * @inheritDoc
 	 */
+	public static override get isOfficialPlugin(): true {
+		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	constructor( editor: Editor ) {
 		super( editor );
 
@@ -117,9 +124,13 @@ export default class TablePropertiesUI extends Plugin {
 		const editor = this.editor;
 		const t = editor.t;
 
-		this._defaultTableProperties = getNormalizedDefaultProperties( editor.config.get( 'table.tableProperties.defaultProperties' )!, {
-			includeAlignmentProperty: true
-		} );
+		this._defaultTableProperties = getNormalizedDefaultTableProperties(
+			editor.config.get( 'table.tableProperties.defaultProperties' )!,
+			{
+				includeAlignmentProperty: true
+			}
+		);
+
 		this._balloon = editor.plugins.get( ContextualBalloon );
 
 		editor.ui.componentFactory.add( 'tableProperties', locale => {

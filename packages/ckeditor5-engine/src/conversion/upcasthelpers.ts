@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 import Matcher, { type ClassPatterns, type MatcherPattern, type PropertyPatterns } from '../view/matcher.js';
@@ -536,16 +536,7 @@ export function convertText() {
 				return;
 			}
 
-			// Wrap `$text` in paragraph and include any marker that is directly before `$text`. See #13053.
-			const nodeBefore = position.nodeBefore;
-
 			position = wrapInParagraph( position, writer );
-
-			if ( nodeBefore && nodeBefore.is( 'element', '$marker' ) ) {
-				// Move `$marker` to the paragraph.
-				writer.move( writer.createRangeOn( nodeBefore ), position );
-				position = writer.createPositionAfter( nodeBefore );
-			}
 		}
 
 		consumable.consume( data.viewItem );

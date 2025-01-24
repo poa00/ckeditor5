@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -45,7 +45,7 @@ import {
  * Editor's data model. Read about the model in the
  * {@glink framework/architecture/editing-engine engine architecture} guide.
  */
-export default class Model extends ObservableMixin() {
+export default class Model extends /* #__PURE__ */ ObservableMixin() {
 	/**
 	 * Model's marker collection.
 	 */
@@ -146,11 +146,7 @@ export default class Model extends ObservableMixin() {
 		// at the end of the conversion. `UpcastDispatcher` or at least `Conversion` class looks like a
 		// better place for this registration but both know nothing about `Schema`.
 		this.schema.register( '$marker' );
-		this.schema.addChildCheck( ( context, childDefinition ) => {
-			if ( childDefinition.name === '$marker' ) {
-				return true;
-			}
-		} );
+		this.schema.addChildCheck( () => true, '$marker' ); // Allow everywhere.
 
 		injectSelectionPostFixer( this );
 

@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -25,7 +25,7 @@ import type Node from './node.js';
  * {@link module:engine/view/upcastwriter~UpcastWriter#createDocumentFragment `UpcastWriter#createDocumentFragment()`}
  * method.
  */
-export default class DocumentFragment extends EmitterMixin( TypeCheckable ) implements Iterable<Node> {
+export default class DocumentFragment extends /* #__PURE__ */ EmitterMixin( TypeCheckable ) implements Iterable<Node> {
 	/**
 	 * The document to which this document fragment belongs.
 	 */

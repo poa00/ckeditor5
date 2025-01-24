@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -23,7 +23,7 @@ import type Node from './node.js';
  * The constructor of this class shouldn't be used directly. To create new `EditableElement` use the
  * {@link module:engine/view/downcastwriter~DowncastWriter#createEditableElement `downcastWriter#createEditableElement()`} method.
  */
-export default class EditableElement extends ObservableMixin( ContainerElement ) {
+export default class EditableElement extends /* #__PURE__ */ ObservableMixin( ContainerElement ) {
 	/**
 	 * Whether the editable is in read-write or read-only mode.
 	 *

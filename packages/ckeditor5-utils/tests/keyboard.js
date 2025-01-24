@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 import env from '../src/env.js';
@@ -25,6 +25,11 @@ describe( 'Keyboard', () => {
 		it( 'contains letters', () => {
 			expect( keyCodes.a ).to.equal( 65 );
 			expect( keyCodes.z ).to.equal( 90 );
+		} );
+
+		it( 'contains page up and down keys', () => {
+			expect( keyCodes.pageup ).to.equal( 33 );
+			expect( keyCodes.pagedown ).to.equal( 34 );
 		} );
 
 		it( 'modifiers and other keys', () => {
@@ -307,6 +312,11 @@ describe( 'Keyboard', () => {
 				expect( getEnvKeystrokeText( 'Arrowup' ) ).to.equal( '↑' );
 				expect( getEnvKeystrokeText( 'Arrowright' ) ).to.equal( '→' );
 				expect( getEnvKeystrokeText( 'Arrowdown' ) ).to.equal( '↓' );
+			} );
+
+			it( 'uses human readable labels for Page up and Page down', () => {
+				expect( getEnvKeystrokeText( 'pageup' ) ).to.equal( 'Page Up' );
+				expect( getEnvKeystrokeText( 'pagedown' ) ).to.equal( 'Page Down' );
 			} );
 		} );
 

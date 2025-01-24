@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -24,7 +24,7 @@ import isIterable from './isiterable.js';
  *
  * @typeParam T The type of the collection element.
  */
-export default class Collection<T extends Record<string, any>> extends EmitterMixin() implements Iterable<T> {
+export default class Collection<T extends Record<string, any>> extends /* #__PURE__ */ EmitterMixin() implements Iterable<T> {
 	/**
 	 * The internal list of items in the collection.
 	 */

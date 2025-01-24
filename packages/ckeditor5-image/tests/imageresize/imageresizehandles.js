@@ -1,9 +1,9 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
-/* global document */
+/* global document, window */
 
 // ClassicTestEditor can't be used, as it doesn't handle the focus, which is needed to test resizer visual cues.
 import ClassicEditor from '@ckeditor/ckeditor5-editor-classic/src/classiceditor.js';
@@ -50,6 +50,14 @@ describe( 'ImageResizeHandles', () => {
 
 	it( 'should be named', () => {
 		expect( ImageResizeHandles.pluginName ).to.equal( 'ImageResizeHandles' );
+	} );
+
+	it( 'should have `isOfficialPlugin` static flag set to `true`', () => {
+		expect( ImageResizeHandles.isOfficialPlugin ).to.be.true;
+	} );
+
+	it( 'should have `isPremiumPlugin` static flag set to `false`', () => {
+		expect( ImageResizeHandles.isPremiumPlugin ).to.be.false;
 	} );
 
 	describe( 'for block image', () => {
@@ -995,7 +1003,7 @@ describe( 'ImageResizeHandles', () => {
 				attachToSpy.restore();
 			} );
 
-			it( 'should set the paragraph as the resize host for an image wrapped with a link', async () => {
+			it( 'should set non-inline element as the resize host for an image wrapped with a link', async () => {
 				await setModelAndWaitForImages( editor,
 					'<paragraph>' +
 						`[<imageInline linkHref="http://ckeditor.com" src="${ IMAGE_SRC_FIXTURE }" alt="alt text"></imageInline>]` +
@@ -1004,7 +1012,7 @@ describe( 'ImageResizeHandles', () => {
 
 				const resizer = Array.from( editor.plugins.get( 'WidgetResize' )._resizers.values() )[ 0 ];
 
-				expect( resizer._getResizeHost().nodeName ).to.equal( 'P' );
+				expect( window.getComputedStyle( resizer._getResizeHost() ).display ).not.to.equal( 'inline' );
 			} );
 		} );
 
@@ -1039,7 +1047,7 @@ describe( 'ImageResizeHandles', () => {
 		} );
 
 		describe( 'to-do list integration', () => {
-			it( 'should set the list item as the resize host if an image is inside a to-do list', async () => {
+			it( 'should set non-inline as the resize host if an image is inside a to-do list', async () => {
 				editor = await createEditor( {
 					plugins: [ Image, ImageResizeEditing, ImageResizeHandles, LegacyTodoList, Paragraph ]
 				} );
@@ -1052,7 +1060,7 @@ describe( 'ImageResizeHandles', () => {
 
 				const resizer = Array.from( editor.plugins.get( 'WidgetResize' )._resizers.values() )[ 0 ];
 
-				expect( resizer._getResizeHost().nodeName ).to.equal( 'LI' );
+				expect( window.getComputedStyle( resizer._getResizeHost() ).display ).not.to.equal( 'inline' );
 
 				await editor.destroy();
 			} );

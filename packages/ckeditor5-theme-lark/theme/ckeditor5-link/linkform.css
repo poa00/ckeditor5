@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 @import "@ckeditor/ckeditor5-ui/theme/mixins/_dir.css";
@@ -47,7 +47,7 @@
 
 	/* Using additional `.ck` class for stronger CSS specificity than `.ck.ck-link-form > :not(:first-child)`. */
 	& .ck.ck-list {
-		margin: var(--ck-spacing-standard) var(--ck-spacing-large);
+		margin: 0 var(--ck-spacing-large);
 
 		& .ck-button.ck-switchbutton {
 			padding: 0;

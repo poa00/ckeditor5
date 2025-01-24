@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -12,8 +12,6 @@ import { ButtonView } from '@ckeditor/ckeditor5-ui';
 
 import Paragraph from './paragraph.js';
 import type ParagraphCommand from './paragraphcommand.js';
-
-const icon = icons.paragraph;
 
 /**
  * This plugin defines the `'paragraph'` button. It can be used together with
@@ -52,7 +50,7 @@ export default class ParagraphButtonUI extends Plugin {
 			const command: ParagraphCommand = editor.commands.get( 'paragraph' )!;
 
 			view.label = t( 'Paragraph' );
-			view.icon = icon;
+			view.icon = icons.paragraph;
 			view.tooltip = true;
 			view.isToggleable = true;
 			view.bind( 'isEnabled' ).to( command );

@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -44,6 +44,13 @@ export default class ImageResizeHandles extends Plugin {
 	 */
 	public static get pluginName() {
 		return 'ImageResizeHandles' as const;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static override get isOfficialPlugin(): true {
+		return true;
 	}
 
 	/**
@@ -101,8 +108,7 @@ export default class ImageResizeHandles extends Plugin {
 						return domWidgetElement.querySelector( 'img' )!;
 					},
 					getResizeHost() {
-						// Return the model image element parent to avoid setting an inline element (<a>/<span>) as a resize host.
-						return domConverter.mapViewToDom( mapper.toViewElement( imageModel.parent as Element )! ) as HTMLElement;
+						return domConverter.mapViewToDom( mapper.toViewElement( imageModel as Element )! ) as HTMLElement;
 					},
 
 					isCentered() {

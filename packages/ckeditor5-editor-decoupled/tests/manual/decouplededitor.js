@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* globals console:false, document, window */
@@ -28,6 +28,7 @@ function initEditor() {
 			console.log( 'Editor was initialized', newEditor );
 			console.log( 'You can now play with it using global `editor` and `editable` variables.' );
 
+			document.querySelector( '.menubar-container' ).appendChild( newEditor.ui.view.menuBarView.element );
 			document.querySelector( '.toolbar-container' ).appendChild( newEditor.ui.view.toolbar.element );
 			document.querySelector( '.editable-container' ).appendChild( newEditor.ui.view.editable.element );
 

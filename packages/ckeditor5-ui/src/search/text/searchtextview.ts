@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -216,7 +216,7 @@ export default class SearchTextView<
 		const stopPropagation = ( data: Event ) => data.stopPropagation();
 
 		for ( const focusableChild of this.focusableChildren ) {
-			this.focusTracker.add( focusableChild.element as Element );
+			this.focusTracker.add( focusableChild.element as HTMLElement );
 		}
 
 		// Start listening for the keystrokes coming from #element.
@@ -244,6 +244,7 @@ export default class SearchTextView<
 	public reset(): void {
 		this.queryView.reset();
 		this.search( '' );
+		this.filteredView.element!.scrollTo( 0, 0 );
 	}
 
 	/**

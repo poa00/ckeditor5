@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 import Model from '../../src/model/model.js';
@@ -133,6 +133,20 @@ describe( 'DataController', () => {
 			const output = data.parse( 'foo', [ '$block' ] );
 
 			expect( stringify( output ) ).to.equal( 'foo' );
+		} );
+
+		it( 'should parse template with children', () => {
+			schema.register( 'container', { inheritAllFrom: '$block' } );
+			schema.register( 'paragraph', { inheritAllFrom: '$block' } );
+			schema.extend( 'paragraph', { allowIn: [ 'container' ] } );
+
+			upcastHelpers.elementToElement( { view: 'template', model: 'container' } );
+			upcastHelpers.elementToElement( { view: 'p', model: 'paragraph' } );
+
+			const output = data.parse( '<template><p>foo</p></template>' );
+
+			expect( output ).to.instanceof( ModelDocumentFragment );
+			expect( stringify( output ) ).to.equal( '<container><paragraph>foo</paragraph></container>' );
 		} );
 	} );
 
@@ -348,7 +362,7 @@ describe( 'DataController', () => {
 		} );
 
 		it( 'should parse given data before set in a context of correct root', () => {
-			schema.extend( '$text', { allowIn: '$title', disallowIn: '$root' } );
+			schema.extend( '$text', { allowIn: '$title' } );
 			data.set( 'foo', 'main' );
 			data.set( { title: 'Bar' } );
 
@@ -589,6 +603,19 @@ describe( 'DataController', () => {
 			sinon.assert.calledWithMatch( stub, 'datacontroller-get-detached-root' );
 
 			console.warn.restore();
+		} );
+
+		it( 'should get template with children', () => {
+			schema.register( 'container', { inheritAllFrom: '$block' } );
+			schema.extend( 'paragraph', { allowIn: [ 'container' ] } );
+			setData( model, '<container><paragraph>foo</paragraph></container>' );
+
+			downcastHelpers.elementToElement( {
+				model: 'container',
+				view: 'template'
+			} );
+
+			expect( data.get() ).to.equal( '<template><p>foo</p></template>' );
 		} );
 	} );
 

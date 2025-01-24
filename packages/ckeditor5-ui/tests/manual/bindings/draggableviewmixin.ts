@@ -1,12 +1,12 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 import { View } from '../../../src/index.js';
 import DraggableViewMixin, { type DraggableView } from '../../../src/bindings/draggableviewmixin.js';
 
-class DraggableTestView extends DraggableViewMixin( View ) implements DraggableView {
+class DraggableTestView extends /* #__PURE__ */ DraggableViewMixin( View ) implements DraggableView {
 	declare public top: number;
 	declare public left: number;
 

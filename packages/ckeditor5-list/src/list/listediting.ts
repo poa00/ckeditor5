@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -45,7 +45,6 @@ import {
 	listItemDowncastConverter,
 	listItemDowncastRemoveConverter,
 	listItemUpcastConverter,
-	listUpcastCleanList,
 	reconvertItemsOnDataChange
 } from './converters.js';
 import {
@@ -84,13 +83,13 @@ import '../../theme/list.css';
  */
 const LIST_BASE_ATTRIBUTES = [ 'listType', 'listIndent', 'listItemId' ];
 
-export type ListTypeOptions = 'numbered' | 'bulleted' | 'todo' | 'customNumbered' | 'customBulleted';
+export type ListType = 'numbered' | 'bulleted' | 'todo' | 'customNumbered' | 'customBulleted';
 
 /**
  * Map of model attributes applicable to list blocks.
  */
 export interface ListItemAttributesMap {
-	listType?: ListTypeOptions;
+	listType?: ListType;
 	listIndent?: number;
 	listItemId?: string;
 }
@@ -109,6 +108,13 @@ export default class ListEditing extends Plugin {
 	 */
 	public static get pluginName() {
 		return 'ListEditing' as const;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static override get isOfficialPlugin(): true {
+		return true;
 	}
 
 	/**
@@ -167,6 +173,9 @@ export default class ListEditing extends Plugin {
 		// Register commands.
 		editor.commands.add( 'numberedList', new ListCommand( editor, 'numbered' ) );
 		editor.commands.add( 'bulletedList', new ListCommand( editor, 'bulleted' ) );
+
+		editor.commands.add( 'customNumberedList', new ListCommand(	editor,	'customNumbered', {	multiLevel: true } ) );
+		editor.commands.add( 'customBulletedList', new ListCommand( editor, 'customBulleted', {	multiLevel: true } ) );
 
 		editor.commands.add( 'indentList', new ListIndentCommand( editor, 'forward' ) );
 		editor.commands.add( 'outdentList', new ListIndentCommand( editor, 'backward' ) );
@@ -453,8 +462,6 @@ export default class ListEditing extends Plugin {
 			} )
 			.add( dispatcher => {
 				dispatcher.on<UpcastElementEvent>( 'element:li', listItemUpcastConverter() );
-				dispatcher.on<UpcastElementEvent>( 'element:ul', listUpcastCleanList(), { priority: 'high' } );
-				dispatcher.on<UpcastElementEvent>( 'element:ol', listUpcastCleanList(), { priority: 'high' } );
 			} );
 
 		if ( !multiBlock ) {
@@ -477,7 +484,7 @@ export default class ListEditing extends Plugin {
 					listItemDowncastConverter( attributeNames, this._downcastStrategies, model )
 				);
 
-				dispatcher.on<DowncastRemoveEvent>( 'remove', listItemDowncastRemoveConverter() );
+				dispatcher.on<DowncastRemoveEvent>( 'remove', listItemDowncastRemoveConverter( model.schema ) );
 			} );
 
 		editor.conversion.for( 'dataDowncast' )
@@ -748,7 +755,8 @@ function modelChangePostFixer(
 	listEditing: ListEditing
 ) {
 	const changes = model.document.differ.getChanges();
-	const itemToListHead = new Map<ListElement, ListElement>();
+	const visited = new Set<Element>();
+	const itemToListHead = new Set<ListElement>();
 	const multiBlock = listEditing.editor.config.get( 'list.multiBlock' );
 
 	let applied = false;
@@ -768,30 +776,30 @@ function modelChangePostFixer(
 				}
 			}
 
-			findAndAddListHeadToMap( entry.position, itemToListHead );
+			findAndAddListHeadToMap( entry.position, itemToListHead, visited );
 
 			// Insert of a non-list item - check if there is a list after it.
 			if ( !entry.attributes.has( 'listItemId' ) ) {
-				findAndAddListHeadToMap( entry.position.getShiftedBy( entry.length ), itemToListHead );
+				findAndAddListHeadToMap( entry.position.getShiftedBy( entry.length ), itemToListHead, visited );
 			}
 
 			// Check if there is no nested list.
 			for ( const { item: innerItem, previousPosition } of model.createRangeIn( item as Element ) ) {
 				if ( isListItemBlock( innerItem ) ) {
-					findAndAddListHeadToMap( previousPosition, itemToListHead );
+					findAndAddListHeadToMap( previousPosition, itemToListHead, visited );
 				}
 			}
 		}
 		// Removed list item or block adjacent to a list.
 		else if ( entry.type == 'remove' ) {
-			findAndAddListHeadToMap( entry.position, itemToListHead );
+			findAndAddListHeadToMap( entry.position, itemToListHead, visited );
 		}
 		// Changed list item indent or type.
 		else if ( entry.type == 'attribute' && attributeNames.includes( entry.attributeKey ) ) {
-			findAndAddListHeadToMap( entry.range.start, itemToListHead );
+			findAndAddListHeadToMap( entry.range.start, itemToListHead, visited );
 
 			if ( entry.attributeNewValue === null ) {
-				findAndAddListHeadToMap( entry.range.start.getShiftedBy( 1 ), itemToListHead );
+				findAndAddListHeadToMap( entry.range.start.getShiftedBy( 1 ), itemToListHead, visited );
 			}
 		}
 
@@ -869,7 +877,7 @@ function createModelIndentPasteFixer( model: Model ): GetCallback<ModelInsertCon
 
 		if ( isListItemBlock( position.parent ) ) {
 			refItem = position.parent;
-		} else if ( isListItemBlock( position.nodeBefore ) ) {
+		} else if ( isListItemBlock( position.nodeBefore ) && isListItemBlock( position.nodeAfter ) ) {
 			refItem = position.nodeBefore;
 		} else {
 			return; // Content is not copied into a list.

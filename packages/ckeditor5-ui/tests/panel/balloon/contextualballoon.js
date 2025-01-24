@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 import ClassicTestEditor from '@ckeditor/ckeditor5-core/tests/_utils/classictesteditor.js';
@@ -61,9 +61,17 @@ describe( 'ContextualBalloon', () => {
 			} );
 	} );
 
-	afterEach( () => {
-		editor.destroy();
+	afterEach( async () => {
+		await editor.destroy();
 		editorElement.remove();
+	} );
+
+	it( 'should have `isOfficialPlugin` static flag set to `true`', () => {
+		expect( ContextualBalloon.isOfficialPlugin ).to.be.true;
+	} );
+
+	it( 'should have `isPremiumPlugin` static flag set to `false`', () => {
+		expect( ContextualBalloon.isPremiumPlugin ).to.be.false;
 	} );
 
 	it( 'should create a plugin instance', () => {
@@ -158,18 +166,17 @@ describe( 'ContextualBalloon', () => {
 			const spy = sinon.spy( balloon, '_createPanelView' );
 
 			expect( balloon._view ).to.be.null;
-			expect( editor.ui.view.body.length ).to.equal( 0 );
 			sinon.assert.notCalled( spy );
 
 			expect( balloon.view ).to.instanceof( BalloonPanelView );
 			sinon.assert.calledOnce( spy );
+			expect( editor.ui.view.body.has( balloon._view ) ).to.be.true;
 		} );
 
 		it( 'should create BalloonPanelView on first view added', () => {
 			const spy = sinon.spy( balloon, '_createPanelView' );
 
 			expect( balloon._view ).to.be.null;
-			expect( editor.ui.view.body.length ).to.equal( 0 );
 			sinon.assert.notCalled( spy );
 
 			balloon.add( {
@@ -181,6 +188,7 @@ describe( 'ContextualBalloon', () => {
 
 			expect( balloon._view ).to.instanceof( BalloonPanelView );
 			sinon.assert.calledOnce( spy );
+			expect( editor.ui.view.body.has( balloon._view ) ).to.be.true;
 		} );
 	} );
 
@@ -208,6 +216,60 @@ describe( 'ContextualBalloon', () => {
 
 		it( 'should return false when given view is not in stack', () => {
 			expect( balloon.hasView( viewB ) ).to.false;
+		} );
+	} );
+
+	describe( 'getPositionOptions()', () => {
+		beforeEach( () => {
+			sinon.stub( balloon.view, 'attachTo' ).returns( {} );
+			sinon.stub( balloon.view, 'pin' ).returns( {} );
+		} );
+
+		it( 'should return undefined if last element from visible stack has no position', () => {
+			balloon.add( {
+				view: viewA
+			} );
+
+			expect( balloon.getPositionOptions() ).to.be.undefined;
+		} );
+
+		it( 'should return position of the last visible stack element', () => {
+			balloon.add( {
+				view: viewA,
+				position: {
+					target: 'fake'
+				}
+			} );
+
+			expect( balloon.getPositionOptions() ).to.be.deep.equal( {
+				limiter: balloon.positionLimiter,
+				target: 'fake',
+				viewportOffsetConfig: {
+					top: 0
+				}
+			} );
+		} );
+
+		it( 'should attach limiter to the position of element from the last visible stack if it\'s not present', () => {
+			balloon.add( {
+				view: viewA,
+				position: {
+					target: 'blank'
+				}
+			} );
+
+			expect( balloon.getPositionOptions().limiter ).to.be.equal( balloon.positionLimiter );
+		} );
+
+		it( 'should attach viewportOffsetConfig to the position of element from the last visible stack if it\'s not present', () => {
+			balloon.add( {
+				view: viewA,
+				position: {
+					target: 'blank'
+				}
+			} );
+
+			expect( balloon.getPositionOptions().viewportOffsetConfig ).to.be.equal( editor.ui.viewportOffset );
 		} );
 	} );
 
@@ -796,8 +858,8 @@ describe( 'ContextualBalloon', () => {
 					expect( balloon.view.pin.calledTwice );
 					expect( balloon.view.pin.secondCall.args[ 0 ].viewportOffsetConfig.top ).to.equal( 200 );
 
-					newEditor.destroy();
 					editorElement.remove();
+					return newEditor.destroy();
 				} );
 		} );
 

@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 import LegacyTodoListEditing from '../../src/legacytodolist/legacytodolistediting.js';
@@ -58,6 +58,14 @@ describe( 'LegacyTodoListEditing', () => {
 
 	afterEach( () => {
 		return editor.destroy();
+	} );
+
+	it( 'should have `isOfficialPlugin` static flag set to `true`', () => {
+		expect( LegacyTodoListEditing.isOfficialPlugin ).to.be.true;
+	} );
+
+	it( 'should have `isPremiumPlugin` static flag set to `false`', () => {
+		expect( LegacyTodoListEditing.isPremiumPlugin ).to.be.false;
 	} );
 
 	it( 'should load ListEditing', () => {
@@ -675,6 +683,91 @@ describe( 'LegacyTodoListEditing', () => {
 		} );
 	} );
 
+	describe( 'accessibility', () => {
+		let announcerSpy, editorElement;
+
+		beforeEach( async () => {
+			editorElement = document.createElement( 'div' );
+			document.body.appendChild( editorElement );
+
+			return ClassicTestEditor
+				.create( editorElement, {
+					plugins: [ Paragraph, LegacyTodoListEditing ]
+				} )
+				.then( newEditor => {
+					editor = newEditor;
+
+					model = editor.model;
+					modelDoc = model.document;
+					modelRoot = modelDoc.getRoot();
+
+					view = editor.editing.view;
+					viewDoc = view.document;
+					announcerSpy = sinon.spy( editor.ui.ariaLiveAnnouncer, 'announce' );
+				} );
+		} );
+
+		afterEach( () => {
+			editorElement.remove();
+			return editor.destroy();
+		} );
+
+		it( 'should announce entering and leaving list', () => {
+			setModelData( model,
+				'<paragraph>[Foo]</paragraph>' +
+				'<listItem listType="todo" listIndent="0">1</listItem>' +
+				'<listItem listType="todo" listIndent="0" todoListChecked="true">2</listItem>' +
+				'<paragraph>Foo</paragraph>'
+			);
+
+			moveSelection( [ 1, 0 ], [ 1, 1 ] );
+			expectAnnounce( 'Entering a to-do list' );
+
+			moveSelection( [ 3, 0 ], [ 3, 1 ] );
+			expectAnnounce( 'Leaving a to-do list' );
+		} );
+
+		it( 'should announce entering and leaving list once, even if there is nested list', () => {
+			setModelData( model,
+				'<paragraph>[Foo]</paragraph>' +
+				'<listItem listType="todo" listIndent="0">1</listItem>' +
+				'<listItem listType="todo" listIndent="1">1</listItem>' +
+				'<listItem listType="todo" listIndent="0" todoListChecked="true">2</listItem>' +
+				'<paragraph>Foo</paragraph>'
+			);
+
+			moveSelection( [ 1, 0 ], [ 1, 1 ] );
+			expectAnnounce( 'Entering a to-do list' );
+
+			moveSelection( [ 2, 0 ], [ 2, 1 ] );
+			expectNotToAnnounce( 'Leaving a to-do list' );
+
+			moveSelection( [ 4, 0 ], [ 4, 1 ] );
+			expectAnnounce( 'Leaving a to-do list' );
+		} );
+
+		function expectNotToAnnounce( message ) {
+			expect( announcerSpy ).not.to.be.calledWithExactly( message );
+		}
+
+		function expectAnnounce( message ) {
+			expect( announcerSpy ).to.be.calledWithExactly( message );
+		}
+
+		function moveSelection( startPath, endPath ) {
+			model.change( writer => {
+				writer.setSelection( createRange( modelRoot, startPath, modelRoot, endPath ) );
+			} );
+		}
+
+		function createRange( startElement, startPath, endElement, endPath ) {
+			return model.createRange(
+				model.createPositionFromPath( startElement, startPath ),
+				model.createPositionFromPath( endElement, endPath )
+			);
+		}
+	} );
+
 	describe( 'data pipeline m -> v', () => {
 		it( 'should convert to-do list item', () => {
 			setModelData( model,
@@ -1061,8 +1154,8 @@ describe( 'LegacyTodoListEditing', () => {
 					} );
 			} );
 
-			afterEach( () => {
-				editor.destroy();
+			afterEach( async () => {
+				await editor.destroy();
 			} );
 
 			testArrowKey();
@@ -1104,8 +1197,8 @@ describe( 'LegacyTodoListEditing', () => {
 					} );
 			} );
 
-			afterEach( () => {
-				editor.destroy();
+			afterEach( async () => {
+				await editor.destroy();
 			} );
 
 			testArrowKey();

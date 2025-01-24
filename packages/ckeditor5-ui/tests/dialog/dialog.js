@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 import ClassicTestEditor from '@ckeditor/ckeditor5-core/tests/_utils/classictesteditor.js';
@@ -31,14 +31,26 @@ describe( 'Dialog', () => {
 			} );
 	} );
 
-	afterEach( () => {
-		editor.destroy();
+	afterEach( async () => {
+		await editor.destroy();
 		editorElement.remove();
 		Dialog._visibleDialogPlugin = undefined;
 	} );
 
 	it( 'should have a name', () => {
 		expect( Dialog.pluginName ).to.equal( 'Dialog' );
+	} );
+
+	it( 'should have `isOfficialPlugin` static flag set to `true`', () => {
+		expect( Dialog.isOfficialPlugin ).to.be.true;
+	} );
+
+	it( 'should have `isPremiumPlugin` static flag set to `false`', () => {
+		expect( Dialog.isPremiumPlugin ).to.be.false;
+	} );
+
+	it( 'should initialize with isOpen=false', () => {
+		expect( dialogPlugin.isOpen ).to.be.false;
 	} );
 
 	it( 'should add keystroke accessibility info', () => {
@@ -246,6 +258,40 @@ describe( 'Dialog', () => {
 		} );
 	} );
 
+	describe( 'destroy()', () => {
+		it( 'should unlock scrolling on the document if modal was displayed', () => {
+			dialogPlugin._show( {
+				position: DialogViewPosition.EDITOR_CENTER,
+				isModal: true,
+				className: 'foo'
+			} );
+
+			expect( document.documentElement.classList.contains( 'ck-dialog-scroll-locked' ) ).to.be.true;
+
+			dialogPlugin.destroy();
+
+			expect( document.documentElement.classList.contains( 'ck-dialog-scroll-locked' ) ).to.be.false;
+		} );
+
+		it( 'should not unlock scrolling on the document if modal was displayed by another plugin instance', () => {
+			const tempDialogPlugin = new Dialog( editor );
+
+			tempDialogPlugin._show( {
+				position: DialogViewPosition.EDITOR_CENTER,
+				isModal: true,
+				className: 'foo'
+			} );
+
+			expect( document.documentElement.classList.contains( 'ck-dialog-scroll-locked' ) ).to.be.true;
+
+			dialogPlugin.destroy();
+
+			expect( document.documentElement.classList.contains( 'ck-dialog-scroll-locked' ) ).to.be.true;
+
+			tempDialogPlugin.destroy();
+		} );
+	} );
+
 	describe( 'show()', () => {
 		it( 'should fire the `show` event with id in namespace', () => {
 			const spy = sinon.spy();
@@ -418,6 +464,29 @@ describe( 'Dialog', () => {
 			expect( dialogPlugin._onHide, '`_onHide` should be set' ).to.be.a( 'function' );
 			expect( Dialog._visibleDialogPlugin, '`_visibleDialogPlugin` instance should be set' ).to.equal( dialogPlugin );
 		} );
+
+		it( 'should lock document scroll if the dialog is a modal', () => {
+			expect( document.documentElement.classList.contains( 'ck-dialog-scroll-locked' ) ).to.be.false;
+
+			dialogPlugin._show( {
+				position: DialogViewPosition.EDITOR_CENTER,
+				isModal: true,
+				className: 'foo'
+			} );
+
+			expect( document.documentElement.classList.contains( 'ck-dialog-scroll-locked' ) ).to.be.true;
+		} );
+
+		it( 'should not lock document scroll if the dialog is not a modal', () => {
+			expect( document.documentElement.classList.contains( 'ck-dialog-scroll-locked' ) ).to.be.false;
+
+			dialogPlugin._show( {
+				position: DialogViewPosition.EDITOR_CENTER,
+				className: 'foo'
+			} );
+
+			expect( document.documentElement.classList.contains( 'ck-dialog-scroll-locked' ) ).to.be.false;
+		} );
 	} );
 
 	describe( 'hide()', () => {
@@ -487,6 +556,22 @@ describe( 'Dialog', () => {
 			expect( dialogPlugin.id, 'id should be reset' ).to.be.null;
 			expect( dialogPlugin._onHide, '`_onHide` should be reset' ).to.be.undefined;
 			expect( Dialog._visibleDialogPlugin, '`_visibleDialogPlugin` instance should be reset' ).to.be.null;
+		} );
+
+		it( 'should unlock document scroll if the dialog is a modal', () => {
+			expect( document.documentElement.classList.contains( 'ck-dialog-scroll-locked' ) ).to.be.false;
+
+			dialogPlugin._show( {
+				position: DialogViewPosition.EDITOR_CENTER,
+				isModal: true,
+				className: 'foo'
+			} );
+
+			expect( document.documentElement.classList.contains( 'ck-dialog-scroll-locked' ) ).to.be.true;
+
+			dialogPlugin._hide();
+
+			expect( document.documentElement.classList.contains( 'ck-dialog-scroll-locked' ) ).to.be.false;
 		} );
 	} );
 } );

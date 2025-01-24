@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -13,7 +13,11 @@ import {
 	createDropdown,
 	addListToDropdown,
 	type ButtonExecuteEvent,
-	type ListDropdownItemDefinition
+	type ListDropdownItemDefinition,
+	MenuBarMenuListItemView,
+	MenuBarMenuListView,
+	MenuBarMenuView,
+	MenuBarMenuListItemButtonView
 } from 'ckeditor5/src/ui.js';
 import { Collection } from 'ckeditor5/src/utils.js';
 import type { ParagraphCommand } from 'ckeditor5/src/paragraph.js';
@@ -37,6 +41,13 @@ export default class HeadingUI extends Plugin {
 	/**
 	 * @inheritDoc
 	 */
+	public static override get isOfficialPlugin(): true {
+		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public init(): void {
 		const editor = this.editor;
 		const t = editor.t;
@@ -48,10 +59,8 @@ export default class HeadingUI extends Plugin {
 		editor.ui.componentFactory.add( 'heading', locale => {
 			const titles: Record<string, string> = {};
 			const itemDefinitions: Collection<ListDropdownItemDefinition> = new Collection();
-
 			const headingCommand: HeadingCommand = editor.commands.get( 'heading' )!;
 			const paragraphCommand: ParagraphCommand = editor.commands.get( 'paragraph' )!;
-
 			const commands: Array<Command> = [ headingCommand ];
 
 			for ( const option of options ) {
@@ -147,6 +156,66 @@ export default class HeadingUI extends Plugin {
 			} );
 
 			return dropdownView;
+		} );
+
+		editor.ui.componentFactory.add( 'menuBar:heading', locale => {
+			const menuView = new MenuBarMenuView( locale );
+			const headingCommand: HeadingCommand = editor.commands.get( 'heading' )!;
+			const paragraphCommand: ParagraphCommand = editor.commands.get( 'paragraph' )!;
+			const commands: Array<Command> = [ headingCommand ];
+			const listView = new MenuBarMenuListView( locale );
+
+			menuView.set( {
+				class: 'ck-heading-dropdown'
+			} );
+
+			listView.set( {
+				ariaLabel: t( 'Heading' ),
+				role: 'menu'
+			} );
+
+			menuView.buttonView.set( {
+				label: t( 'Heading' )
+			} );
+
+			menuView.panelView.children.add( listView );
+
+			for ( const option of options ) {
+				const listItemView = new MenuBarMenuListItemView( locale, menuView );
+				const buttonView = new MenuBarMenuListItemButtonView( locale );
+
+				listItemView.children.add( buttonView );
+				listView.items.add( listItemView );
+
+				buttonView.set( {
+					isToggleable: true,
+					label: option.title,
+					role: 'menuitemradio',
+					class: option.class
+				} );
+
+				buttonView.delegate( 'execute' ).to( menuView );
+
+				buttonView.on<ButtonExecuteEvent>( 'execute', () => {
+					const commandName = option.model === 'paragraph' ? 'paragraph' : 'heading';
+
+					editor.execute( commandName, { value: option.model } );
+					editor.editing.view.focus();
+				} );
+
+				if ( option.model === 'paragraph' ) {
+					buttonView.bind( 'isOn' ).to( paragraphCommand, 'value' );
+					commands.push( paragraphCommand );
+				} else {
+					buttonView.bind( 'isOn' ).to( headingCommand, 'value', value => value === option.model );
+				}
+			}
+
+			menuView.bind( 'isEnabled' ).toMany( commands, 'isEnabled', ( ...areEnabled ) => {
+				return areEnabled.some( isEnabled => isEnabled );
+			} );
+
+			return menuView;
 		} );
 	}
 }

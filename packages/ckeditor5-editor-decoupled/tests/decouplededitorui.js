@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* globals document, Event */
@@ -40,8 +40,8 @@ describe( 'DecoupledEditorUI', () => {
 			} );
 	} );
 
-	afterEach( () => {
-		editor.destroy();
+	afterEach( async () => {
+		await editor.destroy();
 	} );
 
 	describe( 'constructor()', () => {
@@ -243,6 +243,13 @@ describe( 'DecoupledEditorUI', () => {
 
 			sinon.assert.callOrder( parentDestroySpy, viewDestroySpy );
 		} );
+
+		it( 'should not crash if called twice', async () => {
+			const newEditor = await VirtualDecoupledTestEditor.create( '' );
+
+			await newEditor.destroy();
+			await newEditor.destroy();
+		} );
 	} );
 
 	describe( 'element()', () => {
@@ -311,7 +318,7 @@ describe( 'Focus handling and navigation between editing root and editor toolbar
 			ui.focusTracker.isFocused = true;
 			ui.focusTracker.focusedElement = domRoot;
 
-			pressAltF10();
+			pressAltF10( editor );
 
 			sinon.assert.calledOnce( spy );
 		} );
@@ -323,11 +330,11 @@ describe( 'Focus handling and navigation between editing root and editor toolbar
 			setModelData( editor.model, '<paragraph>foo[]</paragraph>' );
 
 			// Focus the toolbar.
-			pressAltF10();
+			pressAltF10( editor );
 			ui.focusTracker.focusedElement = toolbarView.element;
 
 			// Try Alt+F10 again.
-			pressAltF10();
+			pressAltF10( editor );
 
 			sinon.assert.calledOnce( toolbarFocusSpy );
 			sinon.assert.notCalled( domRootFocusSpy );
@@ -347,7 +354,7 @@ describe( 'Focus handling and navigation between editing root and editor toolbar
 			);
 
 			// Focus the image balloon toolbar.
-			pressAltF10();
+			pressAltF10( editor );
 			ui.focusTracker.focusedElement = imageToolbar.element;
 
 			sinon.assert.calledOnce( imageToolbarSpy );
@@ -368,10 +375,10 @@ describe( 'Focus handling and navigation between editing root and editor toolbar
 			setModelData( editor.model, '<paragraph>foo[]</paragraph>' );
 
 			// Focus the toolbar.
-			pressAltF10();
+			pressAltF10( editor );
 			ui.focusTracker.focusedElement = toolbarView.element;
 
-			pressEsc();
+			pressEsc( editor );
 
 			sinon.assert.callOrder( toolbarFocusSpy, domRootFocusSpy );
 		} );
@@ -382,29 +389,12 @@ describe( 'Focus handling and navigation between editing root and editor toolbar
 
 			setModelData( editor.model, '<paragraph>foo[]</paragraph>' );
 
-			pressEsc();
+			pressEsc( editor );
 
 			sinon.assert.notCalled( domRootFocusSpy );
 			sinon.assert.notCalled( toolbarFocusSpy );
 		} );
 	} );
-
-	function pressAltF10() {
-		editor.keystrokes.press( {
-			keyCode: keyCodes.f10,
-			altKey: true,
-			preventDefault: sinon.spy(),
-			stopPropagation: sinon.spy()
-		} );
-	}
-
-	function pressEsc() {
-		editor.keystrokes.press( {
-			keyCode: keyCodes.esc,
-			preventDefault: sinon.spy(),
-			stopPropagation: sinon.spy()
-		} );
-	}
 } );
 
 function viewCreator( name ) {
@@ -416,6 +406,23 @@ function viewCreator( name ) {
 
 		return view;
 	};
+}
+
+function pressAltF10( editor ) {
+	editor.keystrokes.press( {
+		keyCode: keyCodes.f10,
+		altKey: true,
+		preventDefault: sinon.spy(),
+		stopPropagation: sinon.spy()
+	} );
+}
+
+function pressEsc( editor ) {
+	editor.keystrokes.press( {
+		keyCode: keyCodes.esc,
+		preventDefault: sinon.spy(),
+		stopPropagation: sinon.spy()
+	} );
 }
 
 class VirtualDecoupledTestEditor extends VirtualTestEditor {

@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* globals document, window, NodeFilter, MutationObserver, HTMLImageElement, console */
@@ -185,6 +185,19 @@ describe( 'Renderer', () => {
 
 			expect( domRoot.getAttribute( 'class' ) ).to.equal( 'foo' );
 			expect( domRoot.getAttribute( 'id' ) ).to.be.not.ok;
+
+			expect( renderer.markedAttributes.size ).to.equal( 0 );
+		} );
+
+		it( 'should remove all attributes', () => {
+			domRoot.setAttribute( 'style', 'border:1px solid red' );
+			domRoot.setAttribute( 'class', 'bar' );
+
+			renderer.markToSync( 'attributes', viewRoot );
+			renderer.render();
+
+			expect( domRoot.getAttribute( 'class' ) ).to.be.not.ok;
+			expect( domRoot.getAttribute( 'style' ) ).to.be.not.ok;
 
 			expect( renderer.markedAttributes.size ).to.equal( 0 );
 		} );
@@ -762,6 +775,56 @@ describe( 'Renderer', () => {
 			expect( domSelection.rangeCount ).to.equal( 1 );
 			expect( domSelection.getRangeAt( 0 ).startContainer ).to.equal( domP.childNodes[ 0 ].childNodes[ 0 ] );
 			expect( domSelection.getRangeAt( 0 ).startOffset ).to.equal( 3 );
+			expect( domSelection.getRangeAt( 0 ).collapsed ).to.be.true;
+
+			// Step 4: No mutation on second render
+			renderer.markToSync( 'children', viewP );
+			renderAndExpectNoChanges( renderer, domRoot );
+		} );
+
+		// See https://github.com/ckeditor/ckeditor5/issues/14028.
+		it( 'should add and remove inline filler in case <p><br>[]</p>', () => {
+			const domSelection = document.getSelection();
+
+			// Step 1: <p><br>{}</p>
+			const { view: viewP, selection: newSelection } = parse(
+				'<container:p><empty:br/>[]</container:p>' );
+
+			viewRoot._appendChild( viewP );
+			selection._setTo( newSelection );
+
+			renderer.markToSync( 'children', viewRoot );
+			renderer.render();
+
+			const domP = domRoot.childNodes[ 0 ];
+
+			expect( domP.childNodes.length ).to.equal( 3 );
+			expect( domP.childNodes[ 0 ].tagName.toLowerCase() ).to.equal( 'br' );
+			expect( domP.childNodes[ 1 ].data ).to.equal( INLINE_FILLER );
+			expect( domConverter.isBlockFiller( domP.childNodes[ 2 ] ) ).to.be.true;
+
+			expect( domSelection.rangeCount ).to.equal( 1 );
+			expect( domSelection.getRangeAt( 0 ).startContainer ).to.equal( domP.childNodes[ 1 ] );
+			expect( domSelection.getRangeAt( 0 ).startOffset ).to.equal( INLINE_FILLER_LENGTH );
+			expect( domSelection.getRangeAt( 0 ).collapsed ).to.be.true;
+
+			// Step 2: No mutation on second render
+			renderer.markToSync( 'children', viewP );
+			renderAndExpectNoChanges( renderer, domRoot );
+
+			// Step 3: <p>{}<br></p>
+			selection._setTo( ViewRange._createFromParentsAndOffsets(
+				viewP.getChild( 0 ), 0, viewP.getChild( 0 ), 0 ) );
+
+			renderer.render();
+
+			expect( domP.childNodes.length ).to.equal( 2 );
+			expect( domP.childNodes[ 0 ].tagName.toLowerCase() ).to.equal( 'br' );
+			expect( domConverter.isBlockFiller( domP.childNodes[ 1 ] ) ).to.be.true;
+
+			expect( domSelection.rangeCount ).to.equal( 1 );
+			expect( domSelection.getRangeAt( 0 ).startContainer ).to.equal( domP.childNodes[ 0 ].childNodes[ 0 ] );
+			expect( domSelection.getRangeAt( 0 ).startOffset ).to.equal( INLINE_FILLER_LENGTH );
 			expect( domSelection.getRangeAt( 0 ).collapsed ).to.be.true;
 
 			// Step 4: No mutation on second render
@@ -5582,29 +5645,6 @@ describe( 'Renderer', () => {
 	} );
 
 	describe( 'Blocking rendering while composing (IME)', () => {
-		it( 'should call #render() as soon as the user end composition in the document', () => {
-			const viewDocument = new ViewDocument( new StylesProcessor() );
-			const selection = new DocumentSelection();
-			const domConverter = new DomConverter( viewDocument, { renderingMode: 'editing' } );
-			const renderer = new Renderer( domConverter, selection );
-
-			renderer.domDocuments.add( document );
-
-			const renderSpy = sinon.spy( renderer, 'render' );
-
-			expect( renderer.isComposing ).to.be.false;
-
-			renderer.isComposing = true;
-
-			sinon.assert.notCalled( renderSpy );
-
-			renderer.isComposing = false;
-
-			sinon.assert.calledOnce( renderSpy );
-
-			viewDocument.destroy();
-		} );
-
 		describe( 'render()', () => {
 			let viewRoot, domRoot;
 
@@ -6086,6 +6126,34 @@ describe( 'Renderer', () => {
 			expect( domRoot.childNodes[ 0 ].tagName ).to.equal( 'B' );
 			expect( domRoot.childNodes[ 0 ].childNodes.length ).to.equal( 1 );
 			expect( domRoot.childNodes[ 0 ].childNodes[ 0 ].data ).to.equal( 'bar' );
+		} );
+
+		it( 'should not update text on Android if only NBSPs are changed while composing', () => {
+			testUtils.sinon.stub( env, 'isAndroid' ).value( true );
+
+			const viewText = new ViewText( viewDocument, 'foo  bar' );
+			viewRoot._appendChild( viewText );
+
+			renderer.markToSync( 'children', viewRoot );
+			renderer.render();
+
+			expect( domRoot.childNodes.length ).to.equal( 1 );
+			expect( domRoot.childNodes[ 0 ].data ).to.equal( 'foo \u00A0bar' );
+
+			// Browser modified NBSP while composing.
+			renderer.isComposing = true;
+			domRoot.childNodes[ 0 ].data = 'foo\u00A0 bar';
+			renderer._updateText( viewText, {} );
+
+			expect( domRoot.childNodes.length ).to.equal( 1 );
+			expect( domRoot.childNodes[ 0 ].data ).to.equal( 'foo\u00A0 bar' );
+
+			// Rendering after composition.
+			renderer.isComposing = false;
+			renderer._updateText( viewText, {} );
+
+			expect( domRoot.childNodes.length ).to.equal( 1 );
+			expect( domRoot.childNodes[ 0 ].data ).to.equal( 'foo \u00A0bar' );
 		} );
 	} );
 

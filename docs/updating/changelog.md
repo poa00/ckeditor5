@@ -3,7 +3,7 @@ category: update-guides
 order: 11
 feedback-widget: false
 meta-title: CKEditor 5 recent changelog | CKEditor 5 Documentation
-menu-title: Recent release changelog
+menu-title: Changelog
 toc-limit: 1
 ---
 
@@ -17,4 +17,4 @@ You can find more information about each release in the blog posts linked at the
 
 This guide provides the changelog information for the 3 latest releases of CKEditor&nbsp;5. For older releases, refer to the [release notes on GitHub](https://github.com/ckeditor/ckeditor5/releases).
 
-{@exec ../scripts/docs/get-latest-changelogs.js}
+{@exec ../scripts/docs/get-latest-changelogs.cjs}

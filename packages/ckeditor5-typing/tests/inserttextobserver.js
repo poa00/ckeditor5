@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* globals document */
@@ -186,7 +186,7 @@ describe( 'InsertTextObserver', () => {
 		const firstCallArgs = insertTextEventSpy.firstCall.args[ 1 ];
 
 		expect( firstCallArgs.text ).to.equal( 'bar' );
-		expect( firstCallArgs.selection.isEqual( view.document.selection ) ).to.be.true;
+		expect( firstCallArgs.selection ).to.be.undefined;
 	} );
 
 	it( 'should ignore the empty compositionend event (without any data)', () => {

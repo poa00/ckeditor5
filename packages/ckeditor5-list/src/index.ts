@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -9,7 +9,7 @@
 
 // List.
 export { default as List } from './list.js';
-export { default as ListEditing, type ListEditingPostFixerEvent, type ListTypeOptions } from './list/listediting.js';
+export { default as ListEditing, type ListEditingPostFixerEvent, type ListType } from './list/listediting.js';
 export { default as ListUtils } from './list/listutils.js';
 export { default as ListUI } from './list/listui.js';
 export { default as ListIndentCommand } from './list/listindentcommand.js';

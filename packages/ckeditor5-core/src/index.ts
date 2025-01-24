@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -17,7 +17,7 @@ export { default as Context, type ContextConfig } from './context.js';
 export { default as ContextPlugin, type ContextPluginDependencies } from './contextplugin.js';
 export { type EditingKeystrokeCallback } from './editingkeystrokehandler.js';
 
-export type { PartialBy, NonEmptyArray } from './typings.js';
+export type { PartialBy, NonEmptyArray, HexColor } from './typings.js';
 
 export { default as Editor, type EditorReadyEvent, type EditorDestroyEvent } from './editor/editor.js';
 export type {
@@ -76,6 +76,7 @@ import objectLeft from './../theme/icons/object-inline-left.svg';
 import objectRight from './../theme/icons/object-inline-right.svg';
 
 import objectSizeFull from './../theme/icons/object-size-full.svg';
+import objectSizeCustom from './../theme/icons/object-size-custom.svg';
 import objectSizeLarge from './../theme/icons/object-size-large.svg';
 import objectSizeSmall from './../theme/icons/object-size-small.svg';
 import objectSizeMedium from './../theme/icons/object-size-medium.svg';
@@ -119,6 +120,11 @@ import outdent from './../theme/icons/outdent.svg';
 
 import table from './../theme/icons/table.svg';
 
+import remove from './../theme/icons/remove.svg';
+
+import bookmark from './../theme/icons/bookmark.svg';
+import bookmarkInline from './../theme/icons/bookmark_inline.svg';
+
 export const icons = {
 	bold,
 	cancel,
@@ -158,6 +164,7 @@ export const icons = {
 	objectBlockLeft,
 	objectBlockRight,
 
+	objectSizeCustom,
 	objectSizeFull,
 	objectSizeLarge,
 	objectSizeSmall,
@@ -194,7 +201,12 @@ export const icons = {
 	indent,
 	outdent,
 
-	table
+	table,
+
+	remove,
+
+	bookmark,
+	bookmarkInline
 };
 
 import './augmentation.js';

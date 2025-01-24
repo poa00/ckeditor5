@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* globals Event, document */
@@ -82,6 +82,10 @@ describe( 'LinkFormView', () => {
 			view.cancelButtonView.fire( 'execute' );
 
 			expect( spy.calledOnce ).to.true;
+		} );
+
+		it( 'should create url input with inputmode=url', () => {
+			expect( view.urlInputView.fieldView.inputMode ).to.be.equal( 'url' );
 		} );
 
 		describe( 'template', () => {
@@ -173,6 +177,45 @@ describe( 'LinkFormView', () => {
 		} );
 	} );
 
+	describe( 'isValid()', () => {
+		it( 'should reset error after successful validation', () => {
+			const view = new LinkFormView( { t: () => {} }, { manualDecorators: [] }, [
+				() => undefined
+			] );
+
+			expect( view.isValid() ).to.be.true;
+			expect( view.urlInputView.errorText ).to.be.null;
+		} );
+
+		it( 'should display first error returned from validators list', () => {
+			const view = new LinkFormView( { t: () => {} }, { manualDecorators: [] }, [
+				() => undefined,
+				() => 'Foo bar',
+				() => 'Another error'
+			] );
+
+			expect( view.isValid() ).to.be.false;
+			expect( view.urlInputView.errorText ).to.be.equal( 'Foo bar' );
+		} );
+
+		it( 'should pass view reference as argument to validator', () => {
+			const validatorSpy = sinon.spy();
+			const view = new LinkFormView( { t: () => {} }, { manualDecorators: [] }, [ validatorSpy ] );
+
+			view.isValid();
+
+			expect( validatorSpy ).to.be.calledOnceWithExactly( view );
+		} );
+	} );
+
+	describe( 'resetFormStatus()', () => {
+		it( 'should clear form input errors', () => {
+			view.urlInputView.errorText = 'Error';
+			view.resetFormStatus();
+			expect( view.urlInputView.errorText ).to.be.null;
+		} );
+	} );
+
 	describe( 'destroy()', () => {
 		it( 'should destroy the FocusTracker instance', () => {
 			const destroySpy = sinon.spy( view.focusTracker, 'destroy' );
@@ -211,6 +254,20 @@ describe( 'LinkFormView', () => {
 			view.focus();
 
 			sinon.assert.calledOnce( spy );
+		} );
+	} );
+
+	describe( 'URL getter', () => {
+		it( 'null value should be returned in URL getter if element is null', () => {
+			view.urlInputView.fieldView.element = null;
+
+			expect( view.url ).to.be.equal( null );
+		} );
+
+		it( 'trimmed DOM input value should be returned in URL getter', () => {
+			view.urlInputView.fieldView.element.value = '  https://cksource.com/  ';
+
+			expect( view.url ).to.be.equal( 'https://cksource.com/' );
 		} );
 	} );
 

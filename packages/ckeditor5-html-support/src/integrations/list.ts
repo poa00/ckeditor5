@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -16,7 +16,7 @@ import type {
 	ListEditingPostFixerEvent,
 	LegacyIndentCommand,
 	ListIndentCommand,
-	ListTypeOptions,
+	ListType,
 	ListUtils
 } from '@ckeditor/ckeditor5-list';
 
@@ -39,6 +39,13 @@ export default class ListElementSupport extends Plugin {
 	 */
 	public static get pluginName() {
 		return 'ListElementSupport' as const;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static override get isOfficialPlugin(): true {
+		return true;
 	}
 
 	/**
@@ -216,7 +223,7 @@ function viewToModelListAttributeConverter( attributeName: string, dataFilter: D
 
 			// Set list attributes only on same level items, those nested deeper are already handled
 			// by the recursive conversion.
-			if ( item.hasAttribute( attributeName ) ) {
+			if ( item.hasAttribute( 'htmlUlAttributes' ) || item.hasAttribute( 'htmlOlAttributes' ) ) {
 				continue;
 			}
 
@@ -230,7 +237,7 @@ function viewToModelListAttributeConverter( attributeName: string, dataFilter: D
 /**
  * Returns HTML attribute name based on provided list type.
  */
-function getAttributeFromListType( listType: ListTypeOptions ) {
+function getAttributeFromListType( listType: ListType ) {
 	return listType === 'numbered' || listType == 'customNumbered' ?
 		'htmlOlAttributes' :
 		'htmlUlAttributes';

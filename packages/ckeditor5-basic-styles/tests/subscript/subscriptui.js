@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* globals document */
@@ -28,8 +28,6 @@ describe( 'SubscriptUI', () => {
 			} )
 			.then( newEditor => {
 				editor = newEditor;
-
-				subView = editor.ui.componentFactory.create( 'subscript' );
 			} );
 	} );
 
@@ -39,33 +37,81 @@ describe( 'SubscriptUI', () => {
 		return editor.destroy();
 	} );
 
-	it( 'should register subscript feature component', () => {
-		expect( subView ).to.be.instanceOf( ButtonView );
-		expect( subView.isOn ).to.be.false;
-		expect( subView.label ).to.equal( 'Subscript' );
-		expect( subView.icon ).to.match( /<svg / );
-		expect( subView.isToggleable ).to.be.true;
+	it( 'should have `isOfficialPlugin` static flag set to `true`', () => {
+		expect( SubscriptUI.isOfficialPlugin ).to.be.true;
 	} );
 
-	it( 'should execute subscript command on model execute event', () => {
-		const executeSpy = testUtils.sinon.spy( editor, 'execute' );
-
-		subView.fire( 'execute' );
-
-		sinon.assert.calledOnce( executeSpy );
-		sinon.assert.calledWithExactly( executeSpy, 'subscript' );
+	it( 'should have `isPremiumPlugin` static flag set to `false`', () => {
+		expect( SubscriptUI.isPremiumPlugin ).to.be.false;
 	} );
 
-	it( 'should bind model to subscript command', () => {
-		const command = editor.commands.get( 'subscript' );
+	describe( 'toolbar button', () => {
+		beforeEach( () => {
+			subView = editor.ui.componentFactory.create( 'subscript' );
+		} );
 
-		expect( subView.isOn ).to.be.false;
-		expect( subView.isEnabled ).to.be.true;
-
-		command.value = true;
-		expect( subView.isOn ).to.be.true;
-
-		command.isEnabled = false;
-		expect( subView.isEnabled ).to.be.false;
+		testButton();
 	} );
+
+	describe( 'menu bar button', () => {
+		beforeEach( () => {
+			subView = editor.ui.componentFactory.create( 'menuBar:subscript' );
+		} );
+
+		testButton();
+
+		it( 'should create button with `menuitemcheckbox` role', () => {
+			expect( subView.role ).to.equal( 'menuitemcheckbox' );
+		} );
+
+		it( 'should bind `isOn` to `aria-checked` attribute', () => {
+			subView.render();
+
+			subView.isOn = true;
+			expect( subView.element.getAttribute( 'aria-checked' ) ).to.be.equal( 'true' );
+
+			subView.isOn = false;
+			expect( subView.element.getAttribute( 'aria-checked' ) ).to.be.equal( 'false' );
+		} );
+	} );
+
+	function testButton() {
+		it( 'should register subscript feature component', () => {
+			expect( subView ).to.be.instanceOf( ButtonView );
+			expect( subView.isOn ).to.be.false;
+			expect( subView.label ).to.equal( 'Subscript' );
+			expect( subView.icon ).to.match( /<svg / );
+			expect( subView.isToggleable ).to.be.true;
+		} );
+
+		it( 'should execute subscript command on model execute event', () => {
+			const executeSpy = testUtils.sinon.spy( editor, 'execute' );
+
+			subView.fire( 'execute' );
+
+			sinon.assert.calledOnce( executeSpy );
+			sinon.assert.calledWithExactly( executeSpy, 'subscript' );
+		} );
+
+		it( 'should bind model to subscript command', () => {
+			const command = editor.commands.get( 'subscript' );
+
+			expect( subView.isEnabled ).to.be.true;
+
+			command.isEnabled = false;
+			expect( subView.isEnabled ).to.be.false;
+		} );
+
+		it( 'should bind `isOn` to `command`.`value`', () => {
+			const command = editor.commands.get( 'subscript' );
+
+			command.value = true;
+
+			expect( subView.isOn ).to.be.true;
+
+			command.value = false;
+
+			expect( subView.isOn ).to.be.false;
+		} );
+	}
 } );

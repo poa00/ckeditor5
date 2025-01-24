@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -45,9 +45,7 @@ import { isObject } from 'lodash-es';
 
 import '../../theme/components/toolbar/toolbar.css';
 
-const { threeVerticalDots } = icons;
-
-export const NESTED_TOOLBAR_ICONS: Record<string, string | undefined> = {
+export const NESTED_TOOLBAR_ICONS: Record<string, string | undefined> = /* #__PURE__ */ ( () => ( {
 	alignLeft: icons.alignLeft,
 	bold: icons.bold,
 	importExport: icons.importExport,
@@ -57,7 +55,7 @@ export const NESTED_TOOLBAR_ICONS: Record<string, string | undefined> = {
 	threeVerticalDots: icons.threeVerticalDots,
 	pilcrow: icons.pilcrow,
 	dragIndicator: icons.dragIndicator
-};
+} ) )();
 
 /**
  * The toolbar view class.
@@ -114,6 +112,14 @@ export default class ToolbarView extends View implements DropdownPanelFocusable 
 	public readonly focusables: ViewCollection<FocusableView>;
 
 	declare public locale: Locale;
+
+	/**
+	 * The property reflected by the `role` DOM attribute to be used by assistive technologies.
+	 *
+	 * @observable
+	 * @default 'toolbar'
+	 */
+	declare public role: string | undefined;
 
 	/**
 	 * Label used by assistive technologies to describe this toolbar element.
@@ -190,6 +196,7 @@ export default class ToolbarView extends View implements DropdownPanelFocusable 
 
 		this.set( 'ariaLabel', t( 'Editor toolbar' ) );
 		this.set( 'maxWidth', 'auto' );
+		this.set( 'role', 'toolbar' );
 
 		this.items = this.createCollection();
 		this.focusTracker = new FocusTracker();
@@ -233,7 +240,7 @@ export default class ToolbarView extends View implements DropdownPanelFocusable 
 			tag: 'div',
 			attributes: {
 				class: classes,
-				role: 'toolbar',
+				role: bind.to( 'role' ),
 				'aria-label': bind.to( 'ariaLabel' ),
 				style: {
 					maxWidth: bind.to( 'maxWidth' )
@@ -262,15 +269,15 @@ export default class ToolbarView extends View implements DropdownPanelFocusable 
 
 		// Children added before rendering should be known to the #focusTracker.
 		for ( const item of this.items ) {
-			this.focusTracker.add( item.element! );
+			this.focusTracker.add( item );
 		}
 
 		this.items.on<CollectionAddEvent<View>>( 'add', ( evt, item ) => {
-			this.focusTracker.add( item.element! );
+			this.focusTracker.add( item );
 		} );
 
 		this.items.on<CollectionRemoveEvent<View>>( 'remove', ( evt, item ) => {
-			this.focusTracker.remove( item.element! );
+			this.focusTracker.remove( item );
 		} );
 
 		// Start listening for the keystrokes coming from #element.
@@ -415,7 +422,8 @@ export default class ToolbarView extends View implements DropdownPanelFocusable 
 					 * name does not exist so it was omitted when rendering the toolbar.
 					 *
 					 * This warning usually shows up when the {@link module:core/plugin~Plugin} which is supposed
-					 * to provide a toolbar item has not been loaded or there is a typo in the configuration.
+					 * to provide a toolbar item has not been loaded or there is a typo in the
+					 * {@link module:core/editor/editorconfig~EditorConfig#toolbar toolbar configuration}.
 					 *
 					 * Make sure the plugin responsible for this toolbar item is loaded and the toolbar configuration
 					 * is correct, e.g. {@link module:basic-styles/bold~Bold} is loaded for the `'bold'` toolbar item.
@@ -541,7 +549,7 @@ export default class ToolbarView extends View implements DropdownPanelFocusable 
 		// Allow disabling icon by passing false.
 		if ( icon !== false ) {
 			// A pre-defined icon picked by name, SVG string, a fallback (default) icon.
-			dropdownView.buttonView.icon = NESTED_TOOLBAR_ICONS[ icon! ] || icon || threeVerticalDots;
+			dropdownView.buttonView.icon = NESTED_TOOLBAR_ICONS[ icon! ] || icon || icons.threeVerticalDots;
 		}
 		// If the icon is disabled, display the label automatically.
 		else {
@@ -1046,7 +1054,7 @@ class DynamicGrouping implements ToolbarBehavior {
 			label: t( 'Show more items' ),
 			tooltip: true,
 			tooltipPosition: locale.uiLanguageDirection === 'rtl' ? 'se' : 'sw',
-			icon: threeVerticalDots
+			icon: icons.threeVerticalDots
 		} );
 
 		return dropdown;

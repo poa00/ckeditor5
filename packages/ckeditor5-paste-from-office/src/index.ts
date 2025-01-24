@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -8,7 +8,7 @@
  */
 
 export { default as PasteFromOffice } from './pastefromoffice.js';
-export { Normalizer, type NormalizerData } from './normalizer.js';
+export type { Normalizer, NormalizerData } from './normalizer.js';
 export { default as MSWordNormalizer } from './normalizers/mswordnormalizer.js';
 export { parseHtml } from './filters/parse.js';
 

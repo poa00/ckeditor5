@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -10,6 +10,7 @@
 import { type Editor, Plugin } from 'ckeditor5/src/core.js';
 import {
 	ButtonView,
+	MenuBarMenuListItemButtonView,
 	Dialog,
 	DialogViewPosition,
 	createDropdown,
@@ -48,6 +49,13 @@ export default class FindAndReplaceUI extends Plugin {
 	}
 
 	/**
+	 * @inheritDoc
+	 */
+	public static override get isOfficialPlugin(): true {
+		return true;
+	}
+
+	/**
 	 * A reference to the find and replace form view.
 	 */
 	public formView: FindAndReplaceFormView & ViewWithCssTransitionDisabler | null;
@@ -82,10 +90,7 @@ export default class FindAndReplaceUI extends Plugin {
 				// Button should be disabled when in source editing mode. See #10001.
 				view.bind( 'isEnabled' ).to( findCommand );
 			} else {
-				view = this._createDialogButton();
-
-				// Button should be disabled when in source editing mode. See #10001.
-				view.bind( 'isEnabled' ).to( findCommand );
+				view = this._createDialogButtonForToolbar();
 			}
 
 			editor.keystrokes.set( 'Ctrl+F', ( data, cancelEvent ) => {
@@ -116,6 +121,12 @@ export default class FindAndReplaceUI extends Plugin {
 
 			return view;
 		} );
+
+		if ( !isUiUsingDropdown ) {
+			editor.ui.componentFactory.add( 'menuBar:findAndReplace', () => {
+				return this._createDialogButtonForMenuBar();
+			} );
+		}
 
 		// Add the information about the keystroke to the accessibility database.
 		editor.accessibility.addKeystrokeInfos( {
@@ -177,16 +188,12 @@ export default class FindAndReplaceUI extends Plugin {
 	/**
 	 * Creates a button that opens a dialog with the find and replace form.
 	 */
-	private _createDialogButton(): ButtonView {
+	private _createDialogButtonForToolbar(): ButtonView {
 		const editor = this.editor;
-		const buttonView = new ButtonView( editor.locale );
+		const buttonView = this._createButton( ButtonView );
 		const dialog = editor.plugins.get( 'Dialog' );
-		const t = editor.locale.t;
 
 		buttonView.set( {
-			icon: loupeIcon,
-			label: t( 'Find and replace' ),
-			keystroke: 'CTRL+F',
 			tooltip: true
 		} );
 
@@ -198,30 +205,91 @@ export default class FindAndReplaceUI extends Plugin {
 		// and let the find and replace editing feature know that all search results can be invalidated
 		// and no longer should be marked in the content.
 		buttonView.on( 'execute', () => {
-			if ( !this.formView ) {
-				this.formView = this._createFormView();
-			}
-
 			if ( buttonView.isOn ) {
 				dialog.hide();
 			} else {
-				dialog.show( {
-					id: 'findAndReplace',
-					title: t( 'Find and replace' ),
-					content: this.formView,
-					position: DialogViewPosition.EDITOR_TOP_SIDE,
-					onShow: () => {
-						this._setupFormView();
-					},
-
-					onHide: () => {
-						this.fire( 'searchReseted' );
-					}
-				} );
+				this._showDialog();
 			}
 		} );
 
 		return buttonView;
+	}
+
+	/**
+	 * Creates a button for for menu bar that will show find and replace dialog.
+	 */
+	private _createDialogButtonForMenuBar(): MenuBarMenuListItemButtonView {
+		const buttonView = this._createButton( MenuBarMenuListItemButtonView );
+		const dialogPlugin = this.editor.plugins.get( 'Dialog' );
+		const dialog = this.editor.plugins.get( 'Dialog' );
+
+		buttonView.set( {
+			role: 'menuitemcheckbox',
+			isToggleable: true
+		} );
+
+		// Button should be on when the find and replace dialog is opened.
+		buttonView.bind( 'isOn' ).to( dialog, 'id', id => id === 'findAndReplace' );
+
+		buttonView.on( 'execute', () => {
+			if ( dialogPlugin.id === 'findAndReplace' ) {
+				dialogPlugin.hide();
+
+				return;
+			}
+
+			this._showDialog();
+		} );
+
+		return buttonView;
+	}
+
+	/**
+	 * Creates a button for find and replace command to use either in toolbar or in menu bar.
+	 */
+	private _createButton<T extends typeof ButtonView | typeof MenuBarMenuListItemButtonView>( ButtonClass: T ): InstanceType<T> {
+		const editor = this.editor;
+		const findCommand = editor.commands.get( 'find' )!;
+		const buttonView = new ButtonClass( editor.locale ) as InstanceType<T>;
+		const t = editor.locale.t;
+
+		// Button should be disabled when in source editing mode. See #10001.
+		buttonView.bind( 'isEnabled' ).to( findCommand );
+
+		buttonView.set( {
+			icon: loupeIcon,
+			label: t( 'Find and replace' ),
+			keystroke: 'CTRL+F'
+		} );
+
+		return buttonView;
+	}
+
+	/**
+	 * Shows the find and replace dialog.
+	 */
+	private _showDialog(): void {
+		const editor = this.editor;
+		const dialog = editor.plugins.get( 'Dialog' );
+		const t = editor.locale.t;
+
+		if ( !this.formView ) {
+			this.formView = this._createFormView();
+		}
+
+		dialog.show( {
+			id: 'findAndReplace',
+			title: t( 'Find and replace' ),
+			content: this.formView,
+			position: DialogViewPosition.EDITOR_TOP_SIDE,
+			onShow: () => {
+				this._setupFormView();
+			},
+
+			onHide: () => {
+				this.fire( 'searchReseted' );
+			}
+		} );
 	}
 
 	/**

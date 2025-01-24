@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 import GeneralHtmlSupport from '../../src/generalhtmlsupport.js';
@@ -15,6 +15,7 @@ import stubUid from '@ckeditor/ckeditor5-list/tests/list/_utils/uid.js';
 
 import { getModelDataWithAttributes } from '../_utils/utils.js';
 import { getData as getModelData, setData as setModelData } from '@ckeditor/ckeditor5-engine/src/dev-utils/model.js';
+import ListElementSupport from '../../src/integrations/list.js';
 
 /* global document */
 
@@ -42,6 +43,14 @@ describe( 'ListElementSupport', () => {
 		editorElement.remove();
 
 		return editor.destroy();
+	} );
+
+	it( 'should have `isOfficialPlugin` static flag set to `true`', () => {
+		expect( ListElementSupport.isOfficialPlugin ).to.be.true;
+	} );
+
+	it( 'should have `isPremiumPlugin` static flag set to `false`', () => {
+		expect( ListElementSupport.isPremiumPlugin ).to.be.false;
 	} );
 
 	it( 'should be named', () => {
@@ -642,6 +651,44 @@ describe( 'ListElementSupport', () => {
 					2: {},
 					3: {},
 					4: {}
+				}
+			} );
+		} );
+
+		it( 'should not apply the attributes from ancestor list', () => {
+			dataFilter.allowElement( /^(ul|ol)$/ );
+			dataFilter.allowAttributes( { name: /^(ul|ol)$/, attributes: { 'data-foo': true } } );
+			dataFilter.allowAttributes( { name: /^(ul|ol)$/, attributes: { 'data-bar': true } } );
+
+			editor.setData( '<ul data-foo="myUl"><li>Foo<ol data-bar="myOl"><li>Bar</li></ol></li></ul>' );
+
+			// The attributes from the `ul` list should not be applied to the `ol` list.
+			// In that case, the postfixer should not create an additional operation to clean those attributes.
+			for ( const operation of editor.model.document.history.getOperations() ) {
+				expect( operation.type ).to.be.not.equal( 'removeAttribute' );
+			}
+
+			expect( getModelDataWithAttributes( model, { withoutSelection: true } ) ).to.deep.equal( {
+				data:
+					'<paragraph htmlLiAttributes="(1)" htmlUlAttributes="(2)" listIndent="0" listItemId="a01" listType="bulleted">' +
+					'Foo' +
+					'</paragraph>' +
+					'<paragraph htmlLiAttributes="(3)" htmlOlAttributes="(4)" listIndent="1" listItemId="a00" listType="numbered">' +
+					'Bar' +
+					'</paragraph>',
+				attributes: {
+					1: {},
+					2: {
+						attributes: {
+							'data-foo': 'myUl'
+						}
+					},
+					3: {},
+					4: {
+						attributes: {
+							'data-bar': 'myOl'
+						}
+					}
 				}
 			} );
 		} );

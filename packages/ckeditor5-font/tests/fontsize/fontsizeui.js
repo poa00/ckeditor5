@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* global document */
@@ -63,7 +63,15 @@ describe( 'FontSizeUI', () => {
 		return editor.destroy();
 	} );
 
-	describe( 'fontSize Dropdown', () => {
+	it( 'should have `isOfficialPlugin` static flag set to `true`', () => {
+		expect( FontSizeUI.isOfficialPlugin ).to.be.true;
+	} );
+
+	it( 'should have `isPremiumPlugin` static flag set to `false`', () => {
+		expect( FontSizeUI.isPremiumPlugin ).to.be.false;
+	} );
+
+	describe( 'toolbar dropdown', () => {
 		let dropdown;
 
 		beforeEach( () => {
@@ -303,6 +311,67 @@ describe( 'FontSizeUI', () => {
 
 				expect( listView.element.role ).to.equal( 'menu' );
 				expect( listView.element.ariaLabel ).to.equal( 'Font Size' );
+			} );
+		} );
+	} );
+
+	describe( 'menu bar', () => {
+		let subMenu;
+
+		beforeEach( () => {
+			command = editor.commands.get( 'fontSize' );
+			subMenu = editor.ui.componentFactory.create( 'menuBar:fontSize' );
+		} );
+
+		it( 'button has the base properties', () => {
+			const button = subMenu.buttonView;
+
+			expect( button ).to.have.property( 'label', 'Font Size' );
+			expect( button ).to.have.property( 'icon', fontSizeIcon );
+		} );
+
+		it( 'button has binding to isEnabled', () => {
+			command.isEnabled = false;
+
+			expect( subMenu.buttonView.isEnabled ).to.be.false;
+
+			command.isEnabled = true;
+			expect( subMenu.buttonView.isEnabled ).to.be.true;
+		} );
+
+		describe( 'font size sub menu button', () => {
+			let buttonSmall;
+
+			beforeEach( () => {
+				buttonSmall = subMenu.panelView.children.first.items.get( 1 ).children.first;
+			} );
+
+			it( 'should focus view after command execution', () => {
+				const focusSpy = testUtils.sinon.spy( editor.editing.view, 'focus' );
+				const executeSpy = sinon.stub( editor, 'execute' );
+
+				buttonSmall.fire( 'execute' );
+
+				sinon.assert.calledOnce( focusSpy );
+				sinon.assert.calledOnce( executeSpy );
+				sinon.assert.calledWithExactly( executeSpy.firstCall, 'fontSize', {
+					value: 'small'
+				} );
+			} );
+
+			it( 'sets item\'s #isOn depending on the value of the CodeBlockCommand', () => {
+				expect( buttonSmall.isOn ).to.be.false;
+
+				command.value = 'small';
+				expect( buttonSmall.isOn ).to.be.true;
+			} );
+
+			it( 'button has proper `aria-checked` attribute set when active', () => {
+				expect( buttonSmall.element.getAttribute( 'aria-checked' ) ).to.be.equal( 'false' );
+
+				command.value = 'small';
+
+				expect( buttonSmall.element.getAttribute( 'aria-checked' ) ).to.be.equal( 'true' );
 			} );
 		} );
 	} );

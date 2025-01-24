@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* globals console:false, document, window */
@@ -21,7 +21,8 @@ function initEditor() {
 	ClassicEditor
 		.create( document.querySelector( '#editor' ), {
 			plugins: [ Enter, Typing, Paragraph, Undo, Heading, Bold, Italic ],
-			toolbar: [ 'heading', '|', 'bold', 'italic', 'undo', 'redo' ]
+			toolbar: [ 'heading', '|', 'bold', 'italic', 'undo', 'redo' ],
+			menuBar: { isVisible: true }
 		} )
 		.then( newEditor => {
 			console.log( 'Editor was initialized', newEditor );

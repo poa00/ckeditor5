@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -28,7 +28,7 @@ import { EmitterMixin } from '@ckeditor/ckeditor5-utils';
  * **Note:** Be very careful when dealing with `LiveRange`. Each `LiveRange` instance bind events that might
  * have to be unbound. Use {@link module:engine/model/liverange~LiveRange#detach detach} whenever you don't need `LiveRange` anymore.
  */
-export default class LiveRange extends EmitterMixin( Range ) {
+export default class LiveRange extends /* #__PURE__ */ EmitterMixin( Range ) {
 	/**
 	 * Creates a live range.
 	 *

@@ -1,13 +1,13 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
  * @module list/todolist/todolistui
  */
 
-import { createUIComponent } from '../list/utils.js';
+import { createUIComponents } from '../list/utils.js';
 import { icons, Plugin } from 'ckeditor5/src/core.js';
 
 /**
@@ -25,9 +25,16 @@ export default class TodoListUI extends Plugin {
 	/**
 	 * @inheritDoc
 	 */
+	public static override get isOfficialPlugin(): true {
+		return true;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
 	public init(): void {
 		const t = this.editor.t;
 
-		createUIComponent( this.editor, 'todoList', t( 'To-do List' ), icons.todoList );
+		createUIComponents( this.editor, 'todoList', t( 'To-do List' ), icons.todoList );
 	}
 }

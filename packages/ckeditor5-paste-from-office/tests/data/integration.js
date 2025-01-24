@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 import Clipboard from '@ckeditor/ckeditor5-clipboard/src/clipboard.js';
@@ -12,8 +12,8 @@ import Underline from '@ckeditor/ckeditor5-basic-styles/src/underline.js';
 import Italic from '@ckeditor/ckeditor5-basic-styles/src/italic.js';
 import Link from '@ckeditor/ckeditor5-link/src/link.js';
 import Strikethrough from '@ckeditor/ckeditor5-basic-styles/src/strikethrough.js';
-import LegacyList from '@ckeditor/ckeditor5-list/src/legacylist.js';
-import LegacyListProperties from '@ckeditor/ckeditor5-list/src/legacylistproperties.js';
+import List from '@ckeditor/ckeditor5-list/src/list.js';
+import ListProperties from '@ckeditor/ckeditor5-list/src/listproperties.js';
 import Image from '@ckeditor/ckeditor5-image/src/image.js';
 import Table from '@ckeditor/ckeditor5-table/src/table.js';
 import TableProperties from '@ckeditor/ckeditor5-table/src/tableproperties.js';
@@ -21,14 +21,24 @@ import TableCellProperties from '@ckeditor/ckeditor5-table/src/tablecellproperti
 import FontBackgroundColor from '@ckeditor/ckeditor5-font/src/fontbackgroundcolor.js';
 import FontColor from '@ckeditor/ckeditor5-font/src/fontcolor.js';
 import PageBreak from '@ckeditor/ckeditor5-page-break/src/pagebreak.js';
+import Bookmark from '@ckeditor/ckeditor5-bookmark/src/bookmark.js';
 
 import PasteFromOffice from '../../src/pastefromoffice.js';
 import { generateTests } from '../_utils/utils.js';
 import * as fixtures from '../_utils/fixtures.js';
 
+import stubUid from '@ckeditor/ckeditor5-list/tests/list/_utils/uid.js';
+import testUtils from '@ckeditor/ckeditor5-core/tests/_utils/utils.js';
+
 const browsers = [ 'chrome', 'firefox', 'safari', 'edge' ];
 
 describe( 'PasteFromOffice - integration', () => {
+	testUtils.createSinonSandbox();
+
+	beforeEach( () => {
+		stubUid();
+	} );
+
 	generateIntegrationTests( {
 		input: 'basic-styles',
 		editorConfig: {
@@ -65,7 +75,7 @@ describe( 'PasteFromOffice - integration', () => {
 	generateIntegrationTests( {
 		input: 'list',
 		editorConfig: {
-			plugins: [ Clipboard, Paragraph, Heading, Bold, Italic, Underline, Link, LegacyList, LegacyListProperties, PasteFromOffice ]
+			plugins: [ Clipboard, Paragraph, Heading, Bold, Italic, Underline, Link, List, ListProperties, PasteFromOffice ]
 		},
 		skip: {
 			safari: [ 'heading3Styled' ] // Skip due to spacing issue (#13).
@@ -89,14 +99,14 @@ describe( 'PasteFromOffice - integration', () => {
 	generateIntegrationTests( {
 		input: 'google-docs-list',
 		editorConfig: {
-			plugins: [ Clipboard, Paragraph, LegacyList, PasteFromOffice ]
+			plugins: [ Clipboard, Paragraph, List, PasteFromOffice ]
 		}
 	} );
 
 	generateIntegrationTests( {
 		input: 'generic-list-in-table',
 		editorConfig: {
-			plugins: [ Clipboard, Paragraph, LegacyList, Table, Bold, PasteFromOffice ]
+			plugins: [ Clipboard, Paragraph, List, Table, Bold, PasteFromOffice ]
 		}
 	} );
 
@@ -134,6 +144,13 @@ describe( 'PasteFromOffice - integration', () => {
 		input: 'smart-tags',
 		editorConfig: {
 			plugins: [ Clipboard, Paragraph, Bold, PasteFromOffice, FontColor ]
+		}
+	} );
+
+	generateIntegrationTests( {
+		input: 'bookmark',
+		editorConfig: {
+			plugins: [ Clipboard, Paragraph, Bookmark, Table, TableProperties, TableCellProperties, Bold, Image, PasteFromOffice ]
 		}
 	} );
 

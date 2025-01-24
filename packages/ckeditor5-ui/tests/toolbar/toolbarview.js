@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* global document, Event, console */
@@ -193,6 +193,21 @@ describe( 'ToolbarView', () => {
 
 				view.destroy();
 			} );
+
+			it( 'should have proper ARIA properties', () => {
+				expect( view.element.getAttribute( 'role' ) ).to.equal( 'toolbar' );
+			} );
+
+			it( 'should allow customizing toolbar role', () => {
+				const view = new ToolbarView( locale );
+				view.role = 'radiogroup';
+
+				view.render();
+
+				expect( view.element.getAttribute( 'role' ) ).to.equal( 'radiogroup' );
+
+				view.destroy();
+			} );
 		} );
 
 		describe( 'event listeners', () => {
@@ -256,28 +271,36 @@ describe( 'ToolbarView', () => {
 
 			view.render();
 
-			sinon.assert.calledOnce( spyAdd );
+			sinon.assert.calledOnceWithExactly( spyAdd, view.element );
 			sinon.assert.notCalled( spyRemove );
 
 			view.destroy();
 		} );
 
-		it( 'registers #items in #focusTracker', () => {
+		// https://github.com/cksource/ckeditor5-commercial/issues/6633
+		it( 'registers #items in #focusTracker as View instances (not just DOM elements) to alow for complex Views scattered across ' +
+			'multiple DOM sub-trees',
+		() => {
 			const view = new ToolbarView( locale );
 			const spyAdd = sinon.spy( view.focusTracker, 'add' );
 			const spyRemove = sinon.spy( view.focusTracker, 'remove' );
 
-			view.items.add( focusable() );
-			view.items.add( focusable() );
+			const focusableViewA = focusable();
+			const focusableViewB = focusable();
+
+			view.items.add( focusableViewA );
+			view.items.add( focusableViewB );
 			sinon.assert.notCalled( spyAdd );
 
 			view.render();
 
 			// 2 for items and 1 for toolbar itself.
 			sinon.assert.calledThrice( spyAdd );
+			sinon.assert.calledWithExactly( spyAdd.secondCall, focusableViewA );
+			sinon.assert.calledWithExactly( spyAdd.thirdCall, focusableViewB );
 
 			view.items.remove( 1 );
-			sinon.assert.calledOnce( spyRemove );
+			sinon.assert.calledOnceWithExactly( spyRemove, focusableViewB );
 
 			view.destroy();
 		} );

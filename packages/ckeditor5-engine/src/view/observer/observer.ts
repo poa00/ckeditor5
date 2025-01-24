@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -18,7 +18,7 @@ import type View from '../view.js';
  * Observers can also add features to the view, for instance by updating its status or marking elements
  * which need a refresh on DOM events.
  */
-export default abstract class Observer extends DomEmitterMixin() {
+export default abstract class Observer extends /* #__PURE__ */ DomEmitterMixin() {
 	/**
 	 * An instance of the view controller.
 	 */

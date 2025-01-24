@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* globals document, Event */
@@ -69,6 +69,14 @@ describe( 'table cell properties', () => {
 
 		it( 'should be named', () => {
 			expect( TableCellPropertiesUI.pluginName ).to.equal( 'TableCellPropertiesUI' );
+		} );
+
+		it( 'should have `isOfficialPlugin` static flag set to `true`', () => {
+			expect( TableCellPropertiesUI.isOfficialPlugin ).to.be.true;
+		} );
+
+		it( 'should have `isPremiumPlugin` static flag set to `false`', () => {
+			expect( TableCellPropertiesUI.isPremiumPlugin ).to.be.false;
 		} );
 
 		it( 'should load ContextualBalloon', () => {
@@ -693,9 +701,9 @@ describe( 'table cell properties', () => {
 
 					expect( contextualBalloon.visibleView ).to.equal( tableCellPropertiesView );
 					expect( tableCellPropertiesView ).to.include( {
-						borderStyle: 'none',
-						borderColor: '',
-						borderWidth: '',
+						borderStyle: 'solid',
+						borderColor: 'hsl(0, 0%, 75%)',
+						borderWidth: '1px',
 						height: '',
 						padding: '',
 						backgroundColor: '',

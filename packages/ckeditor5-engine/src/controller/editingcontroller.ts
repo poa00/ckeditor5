@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -54,7 +54,7 @@ import type { ViewDocumentInputEvent } from '../view/observer/inputobserver.js';
  * including selection handling. It also creates the {@link ~EditingController#view view} which builds a
  * browser-independent virtualization over the DOM elements. The editing controller also attaches default converters.
  */
-export default class EditingController extends ObservableMixin() {
+export default class EditingController extends /* #__PURE__ */ ObservableMixin() {
 	/**
 	 * Editor model.
 	 */

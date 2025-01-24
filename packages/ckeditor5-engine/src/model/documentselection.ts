@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -60,7 +60,7 @@ const storePrefix = 'selection:';
  * If you need to represent a selection in document fragment,
  * use {@link module:engine/model/selection~Selection Selection class} instead.
  */
-export default class DocumentSelection extends EmitterMixin( TypeCheckable ) {
+export default class DocumentSelection extends /* #__PURE__ */ EmitterMixin( TypeCheckable ) {
 	/**
 	 * Selection used internally by that class (`DocumentSelection` is a proxy to that selection).
 	 */

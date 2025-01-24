@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -16,7 +16,7 @@ type DomFileReader = globalThis.FileReader;
 /**
  * Wrapper over the native `FileReader`.
  */
-export default class FileReader extends ObservableMixin() {
+export default class FileReader extends /* #__PURE__ */ ObservableMixin() {
 	public total!: number;
 
 	/**

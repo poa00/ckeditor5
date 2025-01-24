@@ -1,6 +1,6 @@
 {
   "name": "@ckeditor/ckeditor5-utils",
-  "version": "41.2.1",
+  "version": "44.1.0",
   "description": "Miscellaneous utilities used by CKEditor 5.",
   "keywords": [
     "ckeditor",
@@ -12,21 +12,22 @@
   "type": "module",
   "main": "src/index.ts",
   "dependencies": {
+    "@ckeditor/ckeditor5-ui": "44.1.0",
+    "@types/lodash-es": "4.17.12",
     "lodash-es": "4.17.21"
   },
   "devDependencies": {
-    "@ckeditor/ckeditor5-build-classic": "41.2.1",
-    "@ckeditor/ckeditor5-editor-classic": "41.2.1",
-    "@ckeditor/ckeditor5-core": "41.2.1",
-    "@ckeditor/ckeditor5-engine": "41.2.1",
-    "@types/lodash-es": "^4.17.6",
+    "@ckeditor/ckeditor5-build-classic": "44.1.0",
+    "@ckeditor/ckeditor5-editor-classic": "44.1.0",
+    "@ckeditor/ckeditor5-core": "44.1.0",
+    "@ckeditor/ckeditor5-engine": "44.1.0",
     "typescript": "5.0.4"
   },
   "depcheckIgnore": [
     "typescript"
   ],
   "author": "CKSource (http://cksource.com/)",
-  "license": "GPL-2.0-or-later",
+  "license": "SEE LICENSE IN LICENSE.md",
   "homepage": "https://ckeditor.com/ckeditor-5",
   "bugs": "https://github.com/ckeditor/ckeditor5/issues",
   "repository": {
@@ -35,6 +36,7 @@
     "directory": "packages/ckeditor5-utils"
   },
   "files": [
+    "dist",
     "lang",
     "src/**/*.js",
     "src/**/*.d.ts",
@@ -43,6 +45,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsc -p ./tsconfig.json"
+    "build": "tsc -p ./tsconfig.json",
+    "build:dist": "node ../../scripts/nim/build-package.mjs"
   }
 }

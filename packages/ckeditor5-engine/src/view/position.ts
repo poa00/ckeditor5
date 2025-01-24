@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -12,9 +12,6 @@ import TypeCheckable from './typecheckable.js';
 import { CKEditorError, compareArrays } from '@ckeditor/ckeditor5-utils';
 
 import EditableElement from './editableelement.js';
-
-// To check if component is loaded more than once.
-import '@ckeditor/ckeditor5-utils/src/version.js';
 
 import type DocumentFragment from './documentfragment.js';
 import type Element from './element.js';

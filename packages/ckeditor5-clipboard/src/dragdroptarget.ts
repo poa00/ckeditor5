@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /**
@@ -88,6 +88,13 @@ export default class DragDropTarget extends Plugin {
 	 */
 	public static get pluginName() {
 		return 'DragDropTarget' as const;
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public static override get isOfficialPlugin(): true {
+		return true;
 	}
 
 	/**
@@ -384,7 +391,7 @@ function findDropTargetRange(
 					const targetViewPosition = targetViewRanges[ 0 ].start;
 					const targetModelPosition = mapper.toModelPosition( targetViewPosition );
 					const canDropOnPosition = !draggedRange || Array
-						.from( draggedRange.getItems() )
+						.from( draggedRange.getItems( { shallow: true } ) )
 						.every( item => model.schema.checkChild( targetModelPosition, item as Node ) );
 
 					if ( canDropOnPosition ) {

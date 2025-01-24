@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* globals document */
@@ -41,6 +41,14 @@ describe( 'PlainTableOutput', () => {
 
 	it( 'should have pluginName', () => {
 		expect( PlainTableOutput.pluginName ).to.equal( 'PlainTableOutput' );
+	} );
+
+	it( 'should have `isOfficialPlugin` static flag set to `true`', () => {
+		expect( PlainTableOutput.isOfficialPlugin ).to.be.true;
+	} );
+
+	it( 'should have `isPremiumPlugin` static flag set to `false`', () => {
+		expect( PlainTableOutput.isPremiumPlugin ).to.be.false;
 	} );
 
 	describe( 'conversion in data pipeline', () => {
@@ -176,7 +184,7 @@ describe( 'PlainTableOutput', () => {
 					'</table>'
 				);
 
-				testEditor.destroy();
+				await testEditor.destroy();
 			} );
 
 			it( 'should be overridable', () => {
@@ -450,7 +458,7 @@ describe( 'PlainTableOutput', () => {
 					'</figure>'
 				);
 
-				testEditor.destroy();
+				await testEditor.destroy();
 			} );
 
 			// See: https://github.com/ckeditor/ckeditor5/issues/11394
@@ -482,7 +490,7 @@ describe( 'PlainTableOutput', () => {
 					'</figure>'
 				);
 
-				testEditor.destroy();
+				await testEditor.destroy();
 			} );
 
 			function createEmptyTable() {

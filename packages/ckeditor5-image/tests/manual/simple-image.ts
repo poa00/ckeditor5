@@ -1,6 +1,6 @@
 /**
- * @license Copyright (c) 2003-2024, CKSource Holding sp. z o.o. All rights reserved.
- * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-oss-license
+ * @license Copyright (c) 2003-2025, CKSource Holding sp. z o.o. All rights reserved.
+ * For licensing, see LICENSE.md or https://ckeditor.com/legal/ckeditor-licensing-options
  */
 
 /* globals console, window, document */
@@ -361,6 +361,11 @@ ClassicEditor
 					name: 'resizeImage:original',
 					label: 'Original size',
 					value: null
+				},
+				{
+					name: 'resizeImage:custom',
+					label: 'Custom size',
+					value: 'custom'
 				},
 				{
 					name: 'resizeImage:50',
